@@ -1,4 +1,3 @@
-
 /****************************************************************************
  *  Compilation:  javac QuickFindUF.java
  *  Execution:  java QuickFindUF < input.txt
@@ -25,6 +24,9 @@
  *  @author Robert Sedgewick
  *  @author Kevin Wayne
  */
+
+package MyUtils;
+
 public class QuickFindUF {
     private int[] id;    // id[i] = component identifier of i
     private int count;   // number of components

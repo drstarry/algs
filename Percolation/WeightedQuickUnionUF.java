@@ -1,4 +1,3 @@
-
 /****************************************************************************
  *  Compilation:  javac WeightedQuickUnionUF.java
  *  Execution:  java WeightedQuickUnionUF < input.txt
@@ -26,6 +25,9 @@
  *  @author Robert Sedgewick
  *  @author Kevin Wayne
  */
+
+package MyUtils;
+
 public class WeightedQuickUnionUF {
     private int[] id;    // id[i] = parent of i
     private int[] sz;    // sz[i] = number of objects in subtree rooted at i
@@ -92,8 +94,10 @@ public class WeightedQuickUnionUF {
         if (rootP == rootQ) return;
 
         // make smaller root point to larger one
-        if   (sz[rootP] < sz[rootQ]) { id[rootP] = rootQ; sz[rootQ] += sz[rootP]; }
-        else                         { id[rootQ] = rootP; sz[rootP] += sz[rootQ]; }
+        if   (sz[rootP] < sz[rootQ])
+            { id[rootP] = rootQ; sz[rootQ] += sz[rootP]; }
+        else
+            { id[rootQ] = rootP; sz[rootP] += sz[rootQ]; }
         count--;
     }
 
