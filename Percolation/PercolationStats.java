@@ -15,6 +15,7 @@ For example, if sites are opened in a 20-by-20 lattice according to the snapshot
  *
  ****************************************************************************/
 
+/*
 public class PercolationStats {
     /*
     perform T independent experiments on an N-by-N grid
@@ -27,32 +28,33 @@ public class PercolationStats {
     sample mean of percolation threshold
     */
     public double mean() {
-
+      return;
     }
 
     /*
     sample standard deviation of percolation threshold
     */
     public double stddev() {
-
+      return;
     }
 
     /*
     low  endpoint of 95% confidence interval
     */
     public double confidenceLo() {
-
+      return;
     }
 
     /*
     high endpoint of 95% confidence interval
     */
     public double confidenceHi() {
-
+      return;
     }
 
     public static void main(String[] args) {
-
+      return;
     }
 
 }
+*/

@@ -25,12 +25,12 @@ public class Percolation {
             throw new IllegalArgumentException();
         }
         n = N;
-        System.out.println(n);
-        //gridConnection = new WeightedQuickUnionUF(N*N+2); //0 is top virtual site, N^2+1 is bottom virtual site
+        grid = new int[n+1][n+1];
+        gridConnection = new WeightedQuickUnionUF(N*N+2); //0 is top virtual site, N^2+1 is bottom virtual site
         for (int i=1; i<=N; i++)
             for (int j=1; j<=N; j++)
             {
-                grid[i-1][j-1] = 0;
+                grid[i][j] = 0;
             }
     }
 
@@ -40,8 +40,8 @@ public class Percolation {
     public int[] mapToIndex(int siteID) {
         int[] site = {0,0};
         int i, j;
-        i = siteID%n;
-        j = (siteID-i)/n;
+        i = siteID/n;
+        j = siteID%n;
         site[0] = i+1;
         site[1] = j+1;
         return site;
@@ -77,9 +77,14 @@ public class Percolation {
         if (grid[i][j]!=1) {
             grid[i][j] = 1;
             int[] neighbers = neighbers(i, j);
-            //for (int index=0; index<4; index++) {
-
-            //}
+            int siteCenter = mapToId(i, j);
+            int site;
+            for (int index=0; index<4; index++) {
+                site = neighbers[index];
+                if (site==-1)
+                    continue;
+                gridConnection.union(site, siteCenter);
+            }
         }
     }
 
@@ -109,14 +114,17 @@ public class Percolation {
     */
     public boolean percolates()
     {
-        return false;
+        return gridConnection.connected(0, n*n+1);
     }
 
     public static void main(String[] args) {
         //int N = args[1];
         Percolation p = new Percolation(5);
-        System.out.println(p.mapToId(1,4));
-        System.out.println(p.mapToIndex(7));
+        p.open(1,4);
+        p.open(2,3);
+        p.open(5,4);
+        p.open(3,4);
+        System.out.println(p.percolates());
 
     }
 }
