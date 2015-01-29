@@ -52,12 +52,49 @@ public class PercolationStats {
             p = new Percolation(n);
             while(!p.percolates()) {
                 if(n!=1)
-                    site = p.mapToIndex(StdRandom.uniform(1, n*n));
+                    site = mapToIndex(StdRandom.uniform(1, n*n));
                 p.open(site[0], site[1]);
             }
-            thresholds[i] = p.threshold();
+            thresholds[i] = threshold();
         }
         compute();
+    }
+
+    /*
+    return the  (i, j) of the site given its number
+    */
+    private int[] mapToIndex(int siteID) {
+        int[] site = {0,0};
+        int i, j;
+        i = siteID/n;
+        j = (siteID%n==0)?n:(siteID%n);
+        site[0] = (j==n)?i:(i+1);
+        site[1] = j;
+        return site;
+    }
+
+
+    /*
+    get the num of open sites
+    */
+    private int numOfOpen() {
+        int num = 0;
+        for (int i=1; i<=n; i++)
+            for (int j=1; j<=n; j++)
+            {
+                if (p.isOpen(i, j)||p.isFull(i, j)) {
+                    num++;
+                }
+            }
+        return num;
+    }
+
+    /*
+    get the opened proportion of the grid
+    */
+    private double threshold() {
+        int num = numOfOpen();
+        return (num+0.0)/(n*n);
     }
 
     /*

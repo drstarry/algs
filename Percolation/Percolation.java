@@ -44,7 +44,6 @@ public class Percolation {
         j = (siteID%n==0)?n:(siteID%n);
         site[0] = (j==n)?i:(i+1);
         site[1] = j;
-        //System.out.println(siteID+" "+site[0]+" "+site[1]);
 
         return site;
     }
@@ -77,25 +76,19 @@ public class Percolation {
         if (i>n || j>n || i<1 || j<1) {
             throw new IndexOutOfBoundsException();
         }
-        if (!isOpen(i, j)) {
+        if (!(isOpen(i, j)||isFull(i, j))) {
             grid[i][j] = 1;
             int[] neighbers = neighbers(i, j);
-            //tdArrayIO.print(neighbers);
             int siteCenter = mapToId(i, j);
-            //System.out.println("center: " + siteCenter);
             int site;
             for (int index=0; index<4; index++) {
                 site = neighbers[index];
                 if (site==-1)
                     continue;
                 //only connected the open sites surrounding the center sites, virtual sites are always regarded open
-                if (site==0 || site==n*n+1) {
-                    //System.out.println("v site "+site);
+                if ((site==0 || site==n*n+1) || isOpen(mapToIndex(site)[0], mapToIndex(site)[1])) {
                     gridConnection.union(site, siteCenter);
-                }
-                else if (isOpen(mapToIndex(site)[0], mapToIndex(site)[1])) {
-                    //System.out.println("site "+site);
-                    gridConnection.union(site, siteCenter);
+                    grid[i][j] = 2;
                 }
             }
         }
@@ -118,31 +111,7 @@ public class Percolation {
         if (i>n || j>n || i<1 || j<1) {
             throw new IndexOutOfBoundsException();
         }
-        return (grid[i][j] == 0);
-    }
-
-    /*
-    get the num of open sites
-    p.s: should be called when the system percolates
-    */
-    private int numOfOpen() {
-        int num = 0;
-        for (int i=1; i<=n; i++)
-            for (int j=1; j<=n; j++)
-            {
-                if (isOpen(i, j)) {
-                    num++;
-                }
-            }
-        return num;
-    }
-
-    /*
-    get the opened proportion of the grid
-    */
-    private double threshold() {
-        int num = numOfOpen();
-        return (num+0.0)/(n*n);
+        return (grid[i][j] == 2);
     }
 
     /*
