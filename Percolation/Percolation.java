@@ -13,9 +13,9 @@ import java.lang.*;
 
 public class Percolation {
 
-    public int[][] grid; // the grid, percolation model
-    public WeightedQuickUnionUF gridConnection; // the connection model
-    public int n; // N
+    private int[][] grid; // the grid, percolation model
+    private WeightedQuickUnionUF gridConnection; // the connection model
+    private int n; // N
 
     /*
     create N-by-N grid, with all sites blocked
@@ -37,7 +37,7 @@ public class Percolation {
     /*
     return the  (i, j) of the site given its number
     */
-    public int[] mapToIndex(int siteID) {
+    private int[] mapToIndex(int siteID) {
         int[] site = {0,0};
         int i, j;
         i = siteID/n;
@@ -52,14 +52,14 @@ public class Percolation {
     /*
     return the siteId of the site given its (i, j)
     */
-    public int mapToId(int i, int j) {
+    private int mapToId(int i, int j) {
         return (i-1)*n+j;
     }
 
     /*
     return a site's neighber nites, 3 or 4 sites, top, bottom, left, right respectively
     */
-    public int[] neighbers(int i, int j) {
+    private int[] neighbers(int i, int j) {
         int[] neighbers = {0, 0, 0, 0};
         neighbers[0] = (i==1)?0:mapToId(i-1, j);
         neighbers[1] = (i==n)?(n*n+1):mapToId(i+1, j);
@@ -125,7 +125,7 @@ public class Percolation {
     get the num of open sites
     p.s: should be called when the system percolates
     */
-    public int numOfOpen() {
+    private int numOfOpen() {
         int num = 0;
         for (int i=1; i<=n; i++)
             for (int j=1; j<=n; j++)
@@ -140,7 +140,7 @@ public class Percolation {
     /*
     get the opened proportion of the grid
     */
-    public double threshold() {
+    private double threshold() {
         int num = numOfOpen();
         return (num+0.0)/(n*n);
     }

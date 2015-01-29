@@ -30,14 +30,14 @@ public class PercolationStats {
     perform T independent experiments on an N-by-N grid
     */
 
-    public Percolation p;
-    public double[] thresholds; //a list T threshod
-    public int n;
-    public int t;
-    public double stdDev;
-    public double mean;
-    public double confidenceLo;
-    public double confidenceHi;
+    private Percolation p;
+    private double[] thresholds; //a list T threshod
+    private int n;
+    private int t;
+    private double stdDev;
+    private double mean;
+    private double confidenceLo;
+    private double confidenceHi;
 
     public PercolationStats(int N, int T) {
         if (N<=0 || T<=0) {
@@ -63,7 +63,7 @@ public class PercolationStats {
     /*
     prepare for the values
     */
-    public void compute() {
+    private void compute() {
         mean = StdStats.mean(thresholds);
         stdDev = StdStats.stddev(thresholds);
         confidenceLo = mean - 1.96*stdDev/Math.sqrt(t);
