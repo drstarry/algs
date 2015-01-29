@@ -66,15 +66,16 @@ public class Percolation {
         return neighbers;
     }
 
+
     /*
     open site (row i, column j) if it is not open already
-    connect the sites surround it
+    connect the open sites surround it
     */
     public void open(int i, int j) {
         if (i>n || j>n || i<1 || j<1) {
             throw new IndexOutOfBoundsException();
         }
-        if (grid[i][j]!=1) {
+        if (!isOpen(i, j)) {
             grid[i][j] = 1;
             int[] neighbers = neighbers(i, j);
             int siteCenter = mapToId(i, j);
@@ -83,7 +84,11 @@ public class Percolation {
                 site = neighbers[index];
                 if (site==-1)
                     continue;
-                gridConnection.union(site, siteCenter);
+                //only connected the open sites surrounding the center sites, virtual sites are always regarded open
+                if (site==0 || site==n*n+1)
+                    gridConnection.union(site, siteCenter);
+                else if (isOpen(mapToIndex(site)[0], mapToIndex(site)[1]))
+                    gridConnection.union(site, siteCenter);
             }
         }
     }
@@ -99,13 +104,37 @@ public class Percolation {
     }
 
     /*
-    is site (row i, column j) full?
+    is site (row i, column j) full? what does full mean?
     */
     public boolean isFull(int i, int j) {
         if (i>n || j>n || i<1 || j<1) {
             throw new IndexOutOfBoundsException();
         }
         return (grid[i][j] == 0);
+    }
+
+    /*
+    get the num of open sites
+    p.s: should be called when the system percolates
+    */
+    public int numOfOpen() {
+        int num = 0;
+        for (int i=1; i<=n; i++)
+            for (int j=1; j<=n; j++)
+            {
+                if (isOpen(i, j)) {
+                    num++;
+                }
+            }
+        return num;
+    }
+
+    /*
+    get the opened proportion of the grid
+    */
+    public double threshold() {
+        int num = numOfOpen();
+        return (num+0.0)/(n*n);
     }
 
     /*
@@ -118,7 +147,6 @@ public class Percolation {
     }
 
     public static void main(String[] args) {
-        //int N = args[1];
         Percolation p = new Percolation(5);
         p.open(1,4);
         p.open(2,3);
