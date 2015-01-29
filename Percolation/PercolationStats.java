@@ -14,7 +14,7 @@ Monte Carlo simulation. To estimate the percolation threshold, consider the foll
 For example, if sites are opened in a 20-by-20 lattice according to the snapshots below, then our estimate of the percolation threshold is 204/400 = 0.51 because the system percolates when the 204th site is opened.
 
 random:
-// [a, b)
+// [a, b) ??? what lier!
  public static int uniform(int a, int b) {
         if (b <= a) throw new IllegalArgumentException("Invalid range");
         if ((long) b - a >= Integer.MAX_VALUE) throw new IllegalArgumentException("Invalid range");
@@ -47,17 +47,16 @@ public class PercolationStats {
         t = T;
         thresholds = new double[t];
         Arrays.fill(thresholds, 0.0);
-        int[] site = {0, 0};
+        int[] site = {1, 1};
         for (int i=0; i<t; i++) {
             p = new Percolation(n);
             while(!p.percolates()) {
-                site = p.mapToIndex(StdRandom.uniform(1, n*n));
+                if(n!=1)
+                    site = p.mapToIndex(StdRandom.uniform(1, n*n));
                 p.open(site[0], site[1]);
             }
             thresholds[i] = p.threshold();
-            System.out.println(p.numOfOpen());
         }
-        StdArrayIO.print(thresholds);
         compute();
     }
 
@@ -101,10 +100,9 @@ public class PercolationStats {
 
     public static void main(String[] args) {
         PercolationStats ps = new PercolationStats(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
-        System.out.println(ps.mean());
-        System.out.println(ps.stddev());
-        System.out.println(ps.confidenceLo());
-        System.out.println(ps.confidenceHi());
+        System.out.println("mean = "+ps.mean());
+        System.out.println("stddev = "+ps.stddev());
+        System.out.println("95% confidence interval = "+ps.confidenceLo()+", "+ps.confidenceHi());
     }
 
 }

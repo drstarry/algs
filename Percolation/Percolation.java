@@ -41,9 +41,11 @@ public class Percolation {
         int[] site = {0,0};
         int i, j;
         i = siteID/n;
-        j = siteID%n;
-        site[0] = i+1;
-        site[1] = j+1;
+        j = (siteID%n==0)?n:(siteID%n);
+        site[0] = (j==n)?i:(i+1);
+        site[1] = j;
+        //System.out.println(siteID+" "+site[0]+" "+site[1]);
+
         return site;
     }
 
@@ -51,7 +53,7 @@ public class Percolation {
     return the siteId of the site given its (i, j)
     */
     public int mapToId(int i, int j) {
-        return (i-1)*n+j-1;
+        return (i-1)*n+j;
     }
 
     /*
@@ -78,17 +80,23 @@ public class Percolation {
         if (!isOpen(i, j)) {
             grid[i][j] = 1;
             int[] neighbers = neighbers(i, j);
+            //tdArrayIO.print(neighbers);
             int siteCenter = mapToId(i, j);
+            //System.out.println("center: " + siteCenter);
             int site;
             for (int index=0; index<4; index++) {
                 site = neighbers[index];
                 if (site==-1)
                     continue;
                 //only connected the open sites surrounding the center sites, virtual sites are always regarded open
-                if (site==0 || site==n*n+1)
+                if (site==0 || site==n*n+1) {
+                    //System.out.println("v site "+site);
                     gridConnection.union(site, siteCenter);
-                else if (isOpen(mapToIndex(site)[0], mapToIndex(site)[1]))
+                }
+                else if (isOpen(mapToIndex(site)[0], mapToIndex(site)[1])) {
+                    //System.out.println("site "+site);
                     gridConnection.union(site, siteCenter);
+                }
             }
         }
     }
