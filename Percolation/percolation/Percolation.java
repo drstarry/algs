@@ -14,7 +14,7 @@ import java.lang.*;
 public class Percolation {
 
     private int[][] grid; // the grid, percolation model
-    private WeightedQuickUnionUF gridConnection; // the connection model
+    private WeightedQuickUnionUF gridConnection, gridNoBackWash; // the connection model
     private int n; // N
 
     /*
@@ -27,6 +27,7 @@ public class Percolation {
         n = N;
         grid = new int[n+1][n+1];
         gridConnection = new WeightedQuickUnionUF(N*N+2); //0 is top virtual site, N^2+1 is bottom virtual site
+        gridNoBackWash = new WeightedQuickUnionUF(N*N+1); //0 is top virtual site, N^2+1 is bottom virtual site
         for (int i=1; i<=N; i++)
             for (int j=1; j<=N; j++)
             {
@@ -85,6 +86,8 @@ public class Percolation {
                 //only connected the open sites surrounding the center sites, virtual sites are always regarded open
                 if ((site!=-1) && ((site==0 || site==n*n+1) || isOpen(mapToIndex(site)[0], mapToIndex(site)[1]))) {
                     gridConnection.union(site, siteCenter);
+                    if (site != n*n+1)
+                        gridNoBackWash.union(site, siteCenter);
                 }
             }
         }
@@ -108,7 +111,7 @@ public class Percolation {
             throw new IndexOutOfBoundsException();
         }
         int site = mapToId(i, j);
-        return gridConnection.connected(0, site);
+        return gridNoBackWash.connected(0, site);
     }
 
     /*
