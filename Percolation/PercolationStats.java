@@ -30,8 +30,7 @@ public class PercolationStats {
     perform T independent experiments on an N-by-N grid
     */
 
-    private Percolation p;
-    private double[] thresholds; //a list T threshod
+    //private Percolation p;
     private int n;
     private int t;
     private double stdDev;
@@ -45,19 +44,29 @@ public class PercolationStats {
         }
         n = N;
         t = T;
-        thresholds = new double[t];
-        Arrays.fill(thresholds, 0.0);
+        Percolation p;
         int[] site = {1, 1};
+        double[] thresholds = new double[t]; //a list T threshod
+        Arrays.fill(thresholds, 0.0);
+        int opened = 0;
         for (int i=0; i<t; i++) {
-            p = new Percolation(n);
+            p = new Percolation(N);
             while(!p.percolates()) {
-                if(n!=1)
+                if(n!=1) {
                     site = mapToIndex(StdRandom.uniform(1, n*n));
-                p.open(site[0], site[1]);
+                    if (!p.isOpen(site[0], site[1])) {
+                        p.open(site[0], site[1]);
+                        opened++;
+                    }
+                }
             }
-            thresholds[i] = threshold();
+            thresholds[i] = (opened+0.0) / (n*n);
+            opened = 0;
         }
-        compute();
+        mean = StdStats.mean(thresholds);
+        stdDev = StdStats.stddev(thresholds);
+        confidenceLo = mean - 1.96*stdDev / Math.sqrt(t);
+        confidenceHi = mean + 1.96*stdDev / Math.sqrt(t);
     }
 
     /*
@@ -71,40 +80,6 @@ public class PercolationStats {
         site[0] = (j==n)?i:(i+1);
         site[1] = j;
         return site;
-    }
-
-
-    /*
-    get the num of open sites
-    */
-    private int numOfOpen() {
-        int num = 0;
-        for (int i=1; i<=n; i++)
-            for (int j=1; j<=n; j++)
-            {
-                if (p.isOpen(i, j)||p.isFull(i, j)) {
-                    num++;
-                }
-            }
-        return num;
-    }
-
-    /*
-    get the opened proportion of the grid
-    */
-    private double threshold() {
-        int num = numOfOpen();
-        return (num+0.0)/(n*n);
-    }
-
-    /*
-    prepare for the values
-    */
-    private void compute() {
-        mean = StdStats.mean(thresholds);
-        stdDev = StdStats.stddev(thresholds);
-        confidenceLo = mean - 1.96*stdDev/Math.sqrt(t);
-        confidenceHi = mean + 1.96*stdDev/Math.sqrt(t);
     }
 
     /*

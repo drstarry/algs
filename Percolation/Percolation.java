@@ -44,7 +44,6 @@ public class Percolation {
         j = (siteID%n==0)?n:(siteID%n);
         site[0] = (j==n)?i:(i+1);
         site[1] = j;
-
         return site;
     }
 
@@ -67,7 +66,6 @@ public class Percolation {
         return neighbers;
     }
 
-
     /*
     open site (row i, column j) if it is not open already
     connect the open sites surround it
@@ -76,19 +74,16 @@ public class Percolation {
         if (i>n || j>n || i<1 || j<1) {
             throw new IndexOutOfBoundsException();
         }
-        if (!(isOpen(i, j)||isFull(i, j))) {
+        if (!isOpen(i, j)) {
             grid[i][j] = 1;
             int[] neighbers = neighbers(i, j);
             int siteCenter = mapToId(i, j);
             int site;
             for (int index=0; index<4; index++) {
                 site = neighbers[index];
-                if (site==-1)
-                    continue;
                 //only connected the open sites surrounding the center sites, virtual sites are always regarded open
-                if ((site==0 || site==n*n+1) || isOpen(mapToIndex(site)[0], mapToIndex(site)[1])) {
+                if ((site!=-1) && ((site==0 || site==n*n+1) || isOpen(mapToIndex(site)[0], mapToIndex(site)[1]))) {
                     gridConnection.union(site, siteCenter);
-                    grid[i][j] = 2;
                 }
             }
         }
@@ -101,7 +96,7 @@ public class Percolation {
         if (i>n || j>n || i<1 || j<1) {
             throw new IndexOutOfBoundsException();
         }
-        return (grid[i][j] == 1);
+        return (grid[i][j] != 0);
     }
 
     /*
@@ -111,7 +106,8 @@ public class Percolation {
         if (i>n || j>n || i<1 || j<1) {
             throw new IndexOutOfBoundsException();
         }
-        return (grid[i][j] == 2);
+        int site = mapToId(i, j);
+        return gridConnection.connected(0, site);
     }
 
     /*
@@ -129,7 +125,7 @@ public class Percolation {
         p.open(2,3);
         p.open(5,4);
         p.open(3,4);
-        System.out.println(p.percolates());
+        System.out.println(p.isFull(1,4));
 
     }
 }
