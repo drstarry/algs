@@ -57,10 +57,11 @@ def count_the_inversions(array,count):
     right_count, sorted_right_division = count_the_inversions(right_division, count)
     both_count, sorted_array = sort_count(sorted_left_division, sorted_right_division, count)
 
-    return left_count+right_count+both_count, sorted_array
+    return left_count + right_count + both_count, sorted_array
 
 
 def count_the_inversion_brute_force(array):
+
     pass
 
 
