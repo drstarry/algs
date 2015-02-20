@@ -65,10 +65,15 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         if (isEmpty()) {
             throw new NoSuchElementException();
         }
-        int random = StdRandom.uniform(1, size());
+        int random;
+        if (size()==1) {
+            random = 0;
+        }
+        else
+            random = StdRandom.uniform(1, size());
         Node cur = new Node();
         cur = Head.next;
-        while (random>0 && cur.next!=Tail) {
+        while (random>0 && cur!=Tail) {
             cur = cur.next;
             random--;
         }
@@ -86,7 +91,7 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         int random = StdRandom.uniform(1, size());
         Node cur = new Node();
         cur = Head.next;
-        while (random>0 && cur.next!=Tail) {
+        while (random>0 && cur!=Tail) {
             cur = cur.next;
             random--;
         }
@@ -123,7 +128,7 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         }
 
         public boolean hasNext() {
-            return curIdx != size() ;
+            return curIdx != size();
         }
 
         @SuppressWarnings("unchecked")
@@ -153,7 +158,7 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         }
     }
 
-    private void print() {
+    public void print() {
         Iterator<Item> itr = iterator();
         while(itr.hasNext()) {
              Object element = itr.next();
@@ -196,6 +201,25 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         dec.print();
         dec.enqueue(92);
         dec.print();
+        StdOut.println(dec.sample());
+        StdOut.println(dec.sample());
+        StdOut.println(dec.sample());
+        StdOut.println(dec.sample());
+        StdOut.println(dec.sample());
+        StdOut.println(dec.sample());
+        StdOut.println("---");
+        dec.dequeue();
+        dec.dequeue();
+        dec.dequeue();
+        dec.dequeue();
+        dec.dequeue();
+        dec.dequeue();
+        dec.dequeue();
+        dec.print();
+        dec.dequeue();
+        Iterator<Integer> it = dec.iterator();
+        StdOut.println(it.hasNext());
+        StdOut.println(dec.isEmpty());
     }
 
 }

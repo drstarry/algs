@@ -157,5 +157,7 @@ public class Deque<Item> implements Iterable<Item> {
         dec.print();
         dec.removeFirst();
         dec.print();
+        dec.removeLast();
+        dec.print();
     }
 }
