@@ -18,7 +18,25 @@ import java.util.*;
 
 public class Subset {
    public static void main(String[] args) {
-        int k = args[1];
-        StdOut.print(StdIn.readString());
+        int k = Integer.parseInt(args[0]);
+        RandomizedQueue<String> rq = new RandomizedQueue<String>();
+        String str;
+        boolean flag = true;
+        while (flag)
+        {
+            try {
+                str = StdIn.readString();
+                rq.enqueue(str);
+            }
+            catch (NoSuchElementException e) {
+                flag = false;
+            }
+        }
+        Iterator<String> it = rq.iterator();
+        while (it.hasNext() && k>0) {
+            StdOut.println(it.next());
+            k--;
+        }
+
    }
 }
