@@ -100,7 +100,7 @@ public class Deque<Item> implements Iterable<Item> {
         if (isEmpty()) {
             throw new NoSuchElementException();
         }
-        Item lastItem = Tail.item;
+        Item lastItem = Tail.pre.item;
         Tail.pre = Tail.pre.pre;
         Tail.pre.next = Tail;
         N--;
