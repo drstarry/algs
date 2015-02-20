@@ -117,7 +117,11 @@ public class Deque<Item> implements Iterable<Item> {
 
         private Node cur;
         public dequeIterator() {
-            this.cur = Head.next;
+            if (size()>0) {
+                this.cur = Head.next;
+            }
+            else
+                this.cur = Tail;
         }
         public boolean hasNext() {
             return cur != Tail ;
@@ -139,6 +143,8 @@ public class Deque<Item> implements Iterable<Item> {
 
     private void print() {
         Iterator<Item> itr = iterator();
+        StdOut.print(itr.hasNext());
+        StdOut.print("# ");
         while(itr.hasNext()) {
              Object element = itr.next();
              StdOut.print(element + " ");
@@ -160,8 +166,6 @@ public class Deque<Item> implements Iterable<Item> {
         dec.removeLast();
         dec.print();
         dec.removeLast();
-        dec.print();
-        //dec.removeLast();
         dec.print();
         Iterator<Integer> it = dec.iterator();
         StdOut.println(it.hasNext());
