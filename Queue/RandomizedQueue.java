@@ -66,14 +66,14 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
             throw new NoSuchElementException();
         }
         int random;
-        if (size()==1) {
+        if (size() == 1) {
             random = 0;
         }
         else
-            random = StdRandom.uniform(1, size());
+            random = StdRandom.uniform(0, size());
         Node cur = new Node();
         cur = Head.next;
-        while (random>0 && cur!=Tail) {
+        while (random > 0 && cur.next != Tail) {
             cur = cur.next;
             random--;
         }
@@ -88,10 +88,14 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         if (isEmpty()) {
             throw new NoSuchElementException();
         }
-        int random = StdRandom.uniform(1, size());
-        Node cur = new Node();
-        cur = Head.next;
-        while (random>0 && cur!=Tail) {
+        int random;
+        if (size() == 1) {
+            random = 0;
+        }
+        else
+            random = StdRandom.uniform(0, size());
+        Node cur = Head.next;
+        while (random > 0 && cur.next != Tail) {
             cur = cur.next;
             random--;
         }
@@ -182,9 +186,9 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         dec.print();
         dec.enqueue(10);
         dec.print();
-        dec.enqueue(8);
+        dec.enqueue(17);
         dec.print();
-        dec.enqueue(8);
+        dec.enqueue(11);
         dec.print();
         dec.dequeue();
         dec.print();
@@ -199,16 +203,15 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         dec.print();
         dec.enqueue(4);
         dec.print();
-        dec.enqueue(92);
-        dec.print();
-        StdOut.println(dec.sample());
-        StdOut.println(dec.sample());
-        StdOut.println(dec.sample());
-        StdOut.println(dec.sample());
-        StdOut.println(dec.sample());
-        StdOut.println(dec.sample());
+        // dec.enqueue(92);
+        // dec.print();
         StdOut.println("---");
-        dec.dequeue();
+        int n = 10;
+        while (n>0) {
+            StdOut.println(dec.sample());
+            n--;
+        }
+        StdOut.println("---");
         dec.dequeue();
         dec.dequeue();
         dec.dequeue();

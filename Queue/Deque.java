@@ -159,5 +159,12 @@ public class Deque<Item> implements Iterable<Item> {
         dec.print();
         dec.removeLast();
         dec.print();
+        dec.removeLast();
+        dec.print();
+        //dec.removeLast();
+        dec.print();
+        Iterator<Integer> it = dec.iterator();
+        StdOut.println(it.hasNext());
+        StdOut.println(dec.isEmpty());
     }
 }
