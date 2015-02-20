@@ -15,7 +15,8 @@ public class Deque<Item> implements Iterable<Item> {
     private Node Tail;
     private int N;
 
-    private class Node{             // nested class to define nodes
+    // nested class to define nodes
+    private class Node{
         Item item;
         Node next;
         Node pre;
@@ -25,8 +26,6 @@ public class Deque<Item> implements Iterable<Item> {
     public Deque() {
         Head = new Node();
         Tail = new Node();
-        // Head.next = null;
-        // Tail.pre = null;
         N = 0;
     }
 
@@ -109,35 +108,7 @@ public class Deque<Item> implements Iterable<Item> {
     }
 
     // return an iterator over items in order from front to end
-    // public Iterator<Item> iterator() {
-    //     return new DequeIter<Item>();
-    // }
-
-    // private class DequeIter<Item> implements Iterable<Item> {
-    //     private Node cur;
-
-    //     public DequeIter() {
-    //         cur = Head.next;
-    //     }
-    //     public boolean hasNext() {
-    //         StdOut.println(cur.item);
-    //         return cur.next != Tail;
-    //     }
-
-    //     public Item next() {
-    //         if (!hasNext()) {
-    //             throw new NoSuchElementException();
-    //         }
-    //         Item curItem = cur.item;
-    //         cur = cur.next;
-    //         return curItem;
-    //     }
-
-    //     public void remove() {
-    //         throw new UnsupportedOperationException();
-    //     }
-    // }
-    public Iterator<Item> iterator() {        // return an iterator over items in order from front to end
+    public Iterator<Item> iterator() {
        return new dequeIterator<Item>();
     }
 
@@ -149,8 +120,7 @@ public class Deque<Item> implements Iterable<Item> {
             this.cur = Head.next;
         }
         public boolean hasNext() {
-            //return ((current.next!=null)?true:false);
-            return cur != Tail ;//&& current.next != null;
+            return cur != Tail ;
         }
 
         @SuppressWarnings("unchecked")
@@ -165,11 +135,9 @@ public class Deque<Item> implements Iterable<Item> {
         public void remove() {
             throw new UnsupportedOperationException();
         }
-
-
     }
 
-    public void print() {
+    private void print() {
         Iterator<Item> itr = iterator();
         while(itr.hasNext()) {
              Object element = itr.next();
