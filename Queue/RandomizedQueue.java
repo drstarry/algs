@@ -158,7 +158,7 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         }
     }
 
-    public void print() {
+    private void print() {
         Iterator<Item> itr = iterator();
         while(itr.hasNext()) {
              Object element = itr.next();
