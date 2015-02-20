@@ -114,9 +114,6 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
             for (int i = 0; i<size(); i++)
                 shuffle[i] = i;
             ShuffleArray(shuffle);
-            for (int i = 0; i<size(); i++)
-                StdOut.print(shuffle[i]+",");
-            StdOut.print("\n");
             while(curNode!=Tail && curIdx!=size()) {
                 itemShuffle[shuffle[curIdx]] = (Item) curNode.item;
                 curNode = curNode.next;
