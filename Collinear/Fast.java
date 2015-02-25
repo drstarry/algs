@@ -30,12 +30,13 @@ public class Fast {
         }
         collinearArray = new ArrayList<ArrayList<Point>>();
         sortedpArray = new ArrayList<Point>(N);
-        sortedpArray = sort(pArray, 0, pArray.size() - 1);
+        sortedpArray = sortByPoint(pArray, 0, pArray.size() - 1);
     }
 
     // shuffle the array to get better performance
     private void shuffle(ArrayList<Point> arr) {
-        int index, temp;
+        int index;
+        Point temp;
         Random random = new Random();
         for (int i = arr.size() - 1; i > 0; i--)
         {
@@ -46,25 +47,25 @@ public class Fast {
         }
     }
 
-    private void sort() {
+    private void compute() {
         //shuffle(sortedpArray);
         for (int i = 0; i < N; i++) {
-            Point p0 = array.get(start); // the current origin point
-            quickSort(sortedpArray, p0, i+1, N);
+            Point p0 = sortedpArray.get(i); // the current origin point
+            sortBySlope(sortedpArray, p0, i+1, N-1);
         }
     }
 
     // implement a Dijskstra 3-way partationing algorithms
-    private static void quickSort(ArrayList<Point> array, Point p0, int start, int end) {
+    private void sortBySlope(ArrayList<Point> array, Point p0, int start, int end) {
         if (start >= end) {
             return;
         }
-        Point pv = array.get(start+1); // pivot of comparision with origin p0
+        Point pv = array.get(start); // pivot of comparision with origin p0
         int lt = start; // the cursor for: less thant pivot
         int gt = end; // the cursor for: greater than pivot
         int et = start; // the cursor for: equal to pivot
         while (et < end) {
-            int cmp = p0.compare(array.get(et), pv);
+            int cmp = p0.SLOPE_ORDER.compare(array.get(et), pv);
             if (cmp < 0) {
                 Point temp = pv;
                 pv = array.get(et++);
@@ -75,15 +76,17 @@ public class Fast {
                 array.set(et, array.get(gt));
                 array.set(gt++, temp);
             }
-            else shuffle(sortedpArray);{
+            else {
                 et++;
             }
         }
-        ArrayList<Point> group = sored(array, lt, et);
-        group.add(0, p0);
-        collinearArray.add(group);
-        quickSort(array, p0, start, lt-1);
-        quickSort(array, p0, et+1, end);
+        if (Math.abs(lt-et) >= 2) {
+            ArrayList<Point> group = sortByPoint(array, lt, et);
+            group.add(0, p0);
+            collinearArray.add(group);
+        }
+        sortBySlope(array, p0, start, lt-1);
+        sortBySlope(array, p0, et+1, end);
     }
 
     private void draw() {
@@ -95,8 +98,8 @@ public class Fast {
             p.draw();
         }
 
-        for (int[] group: collinearArray) {
-            sortedpArray.get(group[0]).drawTo(sortedpArray.get(group[3]));
+        for (ArrayList<Point> group: collinearArray) {
+            group.get(0).drawTo(group.get(group.size()-1));
         }
 
         //display to screen all at once
@@ -116,13 +119,13 @@ public class Fast {
         }
     }
 
-    private ArrayList<Point> sort(ArrayList<Point> array, int start, int end) {
+    private ArrayList<Point> sortByPoint(ArrayList<Point> array, int start, int end) {
         if (end == start) {
             return new ArrayList<Point>(Arrays.asList(array.get(start)));
         }
         int half = (start + end)/2;
-        ArrayList<Point> left = sort(array, start, half);
-        ArrayList<Point> right = sort(array, half+1, end);
+        ArrayList<Point> left = sortByPoint(array, start, half);
+        ArrayList<Point> right = sortByPoint(array, half+1, end);
 
         ArrayList<Point> sorted = new ArrayList<Point>(end-start+1);
         int i = 0, j = 0, k = 0;
@@ -151,7 +154,7 @@ public class Fast {
     public static void main(String[] args) {
         String filename = args[0];
         Fast b = new Fast(filename);
-        b.sort();
+        b.compute();
         b.output();
         b.draw();
     }
