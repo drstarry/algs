@@ -7,72 +7,96 @@ Sort the points according to the slopes they makes with p.
 Check if any 3 (or more) adjacent points in the sorted order have equal slopes with respect to p. If so, these points, together with p, are collinear.
 Applying this method for each of the N points in turn yields an efficient algorithm to the problem. The algorithm solves the problem because points that have equal slopes with respect to p are collinear, and sorting brings such points together. The algorithm is fast because the bottleneck operation is sorting.
 */
+
 import java.lang.*;
 import java.util.*;
 
-public class Brute {
+public class Fast {
 
     private int N;
-    private Point[] pArray;
-    private int[] sortedpArray;
-    private ArrayList<int[]> collinearArray;
+    private ArrayList<Point> pArray;
+    private ArrayList<Point> sortedpArray;
+    private ArrayList<ArrayList<Point>> collinearArray;
 
-    public Fast(String filename) {
+    private Fast(String filename) {
         In in = new In(filename);
         N = in.readInt();
-        pArray = new Point[N];
+        pArray = new ArrayList<Point>(N);
         for (int i = 0; i < N; i++) {
             int x = in.readInt();
             int y = in.readInt();
             Point p = new Point(x, y);
-            pArray[i] = p;
+            pArray.add(p);
         }
-        collinearArray = new ArrayList<int[]>();
-        sortedpArray = new int[N];
-        for (int i = 0; i < N; i++) {
-            sortedpArray[i] = i;
-        }
-        sortedpArray = sortPoints(sortedpArray, 0, sortedpArray.length - 1);
+        collinearArray = new ArrayList<ArrayList<Point>>();
+        sortedpArray = new ArrayList<Point>(N);
+        sortedpArray = sort(pArray, 0, pArray.size() - 1);
     }
 
-    public void compare() {
-        for (int i = 0; i+1 < N; i++) {
-            //StdOut.println(i);
-            for (int j = i+1; j+1 < N; j++) {
-                // StdOut.println(j);
-                for (int p = j + 1; p+1 < N; p++) {
-                    // StdOut.println(p);
-                    for (int q = p + 1; q < N; q++) {
-                        // StdOut.println(q);
-                        Point p0 = pArray[sortedpArray[i]];
-                        Point p1 = pArray[sortedpArray[j]];
-                        Point p2 = pArray[sortedpArray[p]];
-                        Point p3 = pArray[sortedpArray[q]];
-                        if (p0.SLOPE_ORDER.compare(p1,p2) == 0 && p0.SLOPE_ORDER.compare(p2,p3) == 0 ) {
-                            int[] group = new int[4];
-                            group[0] = sortedpArray[i];
-                            group[1] = sortedpArray[j];
-                            group[2] = sortedpArray[p];
-                            group[3] = sortedpArray[q];
-                            collinearArray.add(group);
-                        }
-                    }
-                }
+    // shuffle the array to get better performance
+    private void shuffle(ArrayList<Point> arr) {
+        int index, temp;
+        Random random = new Random();
+        for (int i = arr.size() - 1; i > 0; i--)
+        {
+            index = random.nextInt(i + 1);
+            temp = arr.get(index);
+            arr.set(index, arr.get(i));
+            arr.set(i, temp);
+        }
+    }
+
+    private void sort() {
+        //shuffle(sortedpArray);
+        for (int i = 0; i < N; i++) {
+            Point p0 = array.get(start); // the current origin point
+            quickSort(sortedpArray, p0, i+1, N);
+        }
+    }
+
+    // implement a Dijskstra 3-way partationing algorithms
+    private static void quickSort(ArrayList<Point> array, Point p0, int start, int end) {
+        if (start >= end) {
+            return;
+        }
+        Point pv = array.get(start+1); // pivot of comparision with origin p0
+        int lt = start; // the cursor for: less thant pivot
+        int gt = end; // the cursor for: greater than pivot
+        int et = start; // the cursor for: equal to pivot
+        while (et < end) {
+            int cmp = p0.compare(array.get(et), pv);
+            if (cmp < 0) {
+                Point temp = pv;
+                pv = array.get(et++);
+                array.set(lt++, temp);
+            }
+            else if (cmp > 0) {
+                Point temp = array.get(et);
+                array.set(et, array.get(gt));
+                array.set(gt++, temp);
+            }
+            else shuffle(sortedpArray);{
+                et++;
             }
         }
+        ArrayList<Point> group = sored(array, lt, et);
+        group.add(0, p0);
+        collinearArray.add(group);
+        quickSort(array, p0, start, lt-1);
+        quickSort(array, p0, et+1, end);
     }
 
-    public void draw() {
+    private void draw() {
         StdDraw.setXscale(0, 32768);
         StdDraw.setYscale(0, 32768);
         StdDraw.show(0);
         StdDraw.setPenRadius(0.01);  // make the points a bit larger
-        for (Point p: pArray) {
+        for (Point p: sortedpArray) {
             p.draw();
         }
 
         for (int[] group: collinearArray) {
-            pArray[group[0]].drawTo(pArray[group[3]]);
+            sortedpArray.get(group[0]).drawTo(sortedpArray.get(group[3]));
         }
 
         //display to screen all at once
@@ -82,39 +106,43 @@ public class Brute {
         StdDraw.setPenRadius();
     }
 
-    public void output() {
-        for (int[] sortedGroup: collinearArray) {
-            StdOut.print(pArray[sortedGroup[0]].toString());
-            for (int i = 1; i < 4; i++) {
-                StdOut.print(" -> " + pArray[sortedGroup[i]].toString());
+    private void output() {
+        for (ArrayList<Point> sortedGroup: collinearArray) {
+            StdOut.print(sortedGroup.get(0).toString());
+            for (int i = 1; i < sortedGroup.size(); i++) {
+                StdOut.print(" -> " + sortedpArray.get(i).toString());
             }
             StdOut.print("\n");
         }
     }
 
-    private int[] sort(ArrayList<Type> array, int start, int end) {
+    private ArrayList<Point> sort(ArrayList<Point> array, int start, int end) {
         if (end == start) {
-            return new Type[]{array[start]};
+            return new ArrayList<Point>(Arrays.asList(array.get(start)));
         }
         int half = (start + end)/2;
-        ArrayList<Type> left = sort(array, start, half);
-        ArrayList<Type> right = sort(array, half+1, end);
+        ArrayList<Point> left = sort(array, start, half);
+        ArrayList<Point> right = sort(array, half+1, end);
 
-        ArrayList<Type> sorted = new Type[end-start+1];
+        ArrayList<Point> sorted = new ArrayList<Point>(end-start+1);
         int i = 0, j = 0, k = 0;
-        while (i < left.size() && j < right.size() && k < sorted.size()) {
-            if (left[i].compareTo(right[j]) == -1) {
-                sorted[k++] = left[i++];
+        while (i < left.size() && j < right.size() && k < end-start+1) {
+            if (left.get(i).compareTo(right.get(j)) == -1) {
+                sorted.add(left.get(i++));
+                k++;
             }
             else {
-                sorted[k++] = right[j++];
+                sorted.add(right.get(j++));
+                k++;
             }
         }
-        while (i < left.size() && k < array.size()) {
-            sorted[k++] = left[i++];
+        while (i < left.size() && k < end-start+1) {
+            sorted.add(left.get(i++));
+            k++;
         }
-        while (j < right.size() && k < array.size()) {
-            sorted[k++] = right[j++];
+        while (j < right.size() && k < end-start+1) {
+            sorted.add(right.get(j++));
+            k++;
         }
 
         return sorted;
@@ -122,8 +150,8 @@ public class Brute {
 
     public static void main(String[] args) {
         String filename = args[0];
-        Brute b = new Brute(filename);
-        b.compare();
+        Fast b = new Fast(filename);
+        b.sort();
         b.output();
         b.draw();
     }
