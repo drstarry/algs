@@ -14,24 +14,20 @@ import java.util.*;
 public class Fast {
 
     private int N;
-    private Point[] pArray;
     private Point[] sortedpArray;
     private ArrayList<Point[]> collinearArray;
 
     private Fast(String filename) {
         In in = new In(filename);
         N = in.readInt();
-        pArray = new Point[N];
         sortedpArray = new Point[N];
         for (int i = 0; i < N; i++) {
             int x = in.readInt();
             int y = in.readInt();
             Point p = new Point(x, y);
             sortedpArray[i] = p;
-            pArray[i] = p;
         }
         collinearArray = new ArrayList<Point[]>();
-        pArray = sortByPoint(pArray, 0, pArray.length - 1);
         sortedpArray = sortByPoint(sortedpArray, 0, sortedpArray.length - 1);
     }
 

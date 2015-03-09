@@ -14,7 +14,7 @@ public class Brute {
     private ArrayList<Point> sortedpArray;
     private ArrayList<int[]> collinearArray;
 
-    public Brute(String filename) {
+    Private Brute(String filename) {
         In in = new In(filename);
         N = in.readInt();
         pArray = new ArrayList<Point>(N);
@@ -29,7 +29,7 @@ public class Brute {
         sortedpArray = sort(pArray, 0, pArray.size() - 1);
     }
 
-    public void compare() {
+    Private void compare() {
         for (int i = 0; i+1 < N; i++) {
             for (int j = i+1; j+1 < N; j++) {
                 for (int p = j + 1; p+1 < N; p++) {
@@ -52,7 +52,7 @@ public class Brute {
         }
     }
 
-    public void draw() {
+    Private void draw() {
         StdDraw.setXscale(0, 32768);
         StdDraw.setYscale(0, 32768);
         StdDraw.show(0);
@@ -72,7 +72,7 @@ public class Brute {
         StdDraw.setPenRadius();
     }
 
-    public void output() {
+    Private void output() {
         for (int[] sortedGroup: collinearArray) {
             StdOut.print(sortedpArray.get(sortedGroup[0]).toString());
             for (int i = 1; i < 4; i++) {
@@ -82,7 +82,7 @@ public class Brute {
         }
     }
 
-    private ArrayList<Point> sort(ArrayList<Point> array, int start, int end) {
+    Private ArrayList<Point> sort(ArrayList<Point> array, int start, int end) {
         if (end == start) {
             return new ArrayList<Point>(Arrays.asList(array.get(start)));
         }
