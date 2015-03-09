@@ -14,80 +14,135 @@ import java.util.*;
 public class Fast {
 
     private int N;
-    private ArrayList<Point> pArray;
-    private ArrayList<Point> sortedpArray;
-    private ArrayList<ArrayList<Point>> collinearArray;
+    private Point[] pArray;
+    private Point[] sortedpArray;
+    private ArrayList<Point[]> collinearArray;
 
     private Fast(String filename) {
         In in = new In(filename);
         N = in.readInt();
-        pArray = new ArrayList<Point>(N);
+        pArray = new Point[N];
+        sortedpArray = new Point[N];
         for (int i = 0; i < N; i++) {
             int x = in.readInt();
             int y = in.readInt();
             Point p = new Point(x, y);
-            pArray.add(p);
+            sortedpArray[i] = p;
+            pArray[i] = p;
         }
-        collinearArray = new ArrayList<ArrayList<Point>>();
-        sortedpArray = new ArrayList<Point>(N);
-        sortedpArray = sortByPoint(pArray, 0, pArray.size() - 1);
+        collinearArray = new ArrayList<Point[]>();
+        pArray = sortByPoint(pArray, 0, pArray.length - 1);
+        sortedpArray = sortByPoint(sortedpArray, 0, sortedpArray.length - 1);
     }
 
     // shuffle the array to get better performance
-    private void shuffle(ArrayList<Point> arr) {
-        int index;
-        Point temp;
-        Random random = new Random();
-        for (int i = arr.size() - 1; i > 0; i--)
-        {
-            index = random.nextInt(i + 1);
-            temp = arr.get(index);
-            arr.set(index, arr.get(i));
-            arr.set(i, temp);
-        }
-    }
+    // private void shuffle(ArrayList<Point> arr) {
+    //     int index;
+    //     Point temp;
+    //     Random random = new Random();
+    //     for (int i = arr.length - 1; i > 0; i--)
+    //     {
+    //         index = random.nextInt(i + 1);
+    //         temp = arr.get(index);
+    //         arr.set(index, arr[i]);
+    //         arr.set(i, temp);
+    //     }
+    // }
 
     private void compute() {
         //shuffle(sortedpArray);
-        for (int i = 0; i < N; i++) {
-            Point p0 = sortedpArray.get(i); // the current origin point
-            sortBySlope(sortedpArray, p0, i+1, N-1);
+        for (int i = 0; i+1 < N; i++) {
+            Point p0 = sortedpArray[i]; // the current origin point
+            Arrays.sort(sortedpArray, i+1, N-1, p0.SLOPE_ORDER);
+            int low=i+1, high=i+2, cmp = 1, j = i+1;
+            while (high < N) {
+                cmp = p0.SLOPE_ORDER.compare(sortedpArray[low], sortedpArray[high]);
+                // /
+                if (cmp==0 && high == N-1) {
+                    if (high-low>=2) {
+                        addResult(p0, low, high);
+                    }
+                }
+                if (cmp != 0) {
+                    if (high-low>=3) {
+                        addResult(p0, low, high-1);
+                    }
+                    low = high;
+                }
+                high++;
+            }
+            sortedpArray = sortByPoint(sortedpArray, 0, sortedpArray.length - 1);
+        }
+    }
+
+    private void addResult(Point p0, int start, int end) {
+        Point[] group = new Point[end-start+2];
+        group[0] = p0;
+        boolean hasGroup = false;
+        for (int i = 1; i < group.length; i++, start++) {
+            group[i] = sortedpArray[start];
+        }
+        for (Point[] oldGroup: collinearArray) {
+            if (oldGroup[0].SLOPE_ORDER.compare(group[0], group[1]) == 0 && oldGroup[1].SLOPE_ORDER.compare(group[0], group[1]) == 0) {
+                if (oldGroup.length < group.length) {
+                    collinearArray.remove(oldGroup);
+                }
+                else
+                    hasGroup = true;
+                break;
+            }
+        }
+        if (!hasGroup) {
+            sortByPoint(group, 0, group.length-1);
+            collinearArray.add(group);
         }
     }
 
     // implement a Dijskstra 3-way partationing algorithms
-    private void sortBySlope(ArrayList<Point> array, Point p0, int start, int end) {
-        if (start >= end) {
-            return;
-        }
-        Point pv = array.get(start); // pivot of comparision with origin p0
-        int lt = start; // the cursor for: less thant pivot
-        int gt = end; // the cursor for: greater than pivot
-        int et = start; // the cursor for: equal to pivot
-        while (et < end) {
-            int cmp = p0.SLOPE_ORDER.compare(array.get(et), pv);
-            if (cmp < 0) {
-                Point temp = pv;
-                pv = array.get(et++);
-                array.set(lt++, temp);
-            }
-            else if (cmp > 0) {
-                Point temp = array.get(et);
-                array.set(et, array.get(gt));
-                array.set(gt++, temp);
-            }
-            else {
-                et++;
-            }
-        }
-        if (Math.abs(lt-et) >= 2) {
-            ArrayList<Point> group = sortByPoint(array, lt, et);
-            group.add(0, p0);
-            collinearArray.add(group);
-        }
-        sortBySlope(array, p0, start, lt-1);
-        sortBySlope(array, p0, et+1, end);
-    }
+    // private void sortBySlope(Point[] array, Point p0, int start, int end) {
+    //     if (start >= end) {
+    //         return;
+    //     }
+    //     Point pv = array[start]; // pivot of comparision with origin p0
+    //     int lt = start; // the cursor for: less thant pivot
+    //     int gt = end; // the cursor for: greater than pivot
+    //     int et = start + 1; // the cursor for: equal to pivot
+    //     while (et <= gt) {
+    //         int cmp = p0.SLOPE_ORDER.compare(array[et], pv);
+    //         if (cmp < 0) {
+    //             Point temp = pv;
+    //             pv = array[et++];
+    //             array[lt++] = temp;
+    //         }
+    //         else if (cmp > 0) {
+    //             Point temp = array[et];
+    //             array[et] = array[gt];
+    //             array[gt--] = temp;
+    //         }
+    //         else {
+    //             et++;
+    //         }
+    //     }
+    //     // if ((gt-lt) >= 3) {
+    //     //     StdOut.println(gt-lt);
+    //     //     ArrayList<Point> newGroup = sortByPoint(array, lt, gt);
+    //     //     newGroup.add(0, p0);
+    //     //     int i;
+    //     //     for (i = 0; i < collinearArray.length; i++) {
+    //     //         if (collinearArray[i].containsAll(newGroup))
+    //     //             break;
+    //     //     }
+    //     //     if (i == collinearArray.length)
+    //     //         collinearArray.add(newGroup);
+    //     //     StdOut.println("!!!");
+    //     //     for (int j=0; j<newGroup.length; j++) {
+    //     //         StdOut.println(newGroup[j]);
+    //     //     }
+    //     //     StdOut.println("!!!");
+    //     // }
+    //     sortBySlope(array, p0, start, lt-1);
+    //     sortBySlope(array, p0, gt+1, end);
+    // }
 
     private void draw() {
         StdDraw.setXscale(0, 32768);
@@ -98,8 +153,8 @@ public class Fast {
             p.draw();
         }
 
-        for (ArrayList<Point> group: collinearArray) {
-            group.get(0).drawTo(group.get(group.size()-1));
+        for (Point[] group: collinearArray) {
+            group[0].drawTo(group[group.length-1]);
         }
 
         //display to screen all at once
@@ -110,42 +165,37 @@ public class Fast {
     }
 
     private void output() {
-        for (ArrayList<Point> sortedGroup: collinearArray) {
-            StdOut.print(sortedGroup.get(0).toString());
-            for (int i = 1; i < sortedGroup.size(); i++) {
-                StdOut.print(" -> " + sortedpArray.get(i).toString());
+        for (Point[] sortedGroup: collinearArray) {
+            for (int i = 0; i < sortedGroup.length - 1 ; i++) {
+                StdOut.print(sortedGroup[i].toString() + " -> ");
             }
-            StdOut.print("\n");
+            StdOut.print(sortedGroup[sortedGroup.length-1].toString() + "\n");
         }
     }
 
-    private ArrayList<Point> sortByPoint(ArrayList<Point> array, int start, int end) {
+    private Point[] sortByPoint(Point[] array, int start, int end) {
         if (end == start) {
-            return new ArrayList<Point>(Arrays.asList(array.get(start)));
+            return new Point[] {array[start]};
         }
         int half = (start + end)/2;
-        ArrayList<Point> left = sortByPoint(array, start, half);
-        ArrayList<Point> right = sortByPoint(array, half+1, end);
+        Point[] left = sortByPoint(array, start, half);
+        Point[] right = sortByPoint(array, half+1, end);
 
-        ArrayList<Point> sorted = new ArrayList<Point>(end-start+1);
+        Point[] sorted = new Point[end-start+1];
         int i = 0, j = 0, k = 0;
-        while (i < left.size() && j < right.size() && k < end-start+1) {
-            if (left.get(i).compareTo(right.get(j)) == -1) {
-                sorted.add(left.get(i++));
-                k++;
+        while (i < left.length && j < right.length && k < end-start+1) {
+            if (left[i].compareTo(right[j]) == -1) {
+                sorted[k++] = left[i++];
             }
             else {
-                sorted.add(right.get(j++));
-                k++;
+                sorted[k++] = right[j++];
             }
         }
-        while (i < left.size() && k < end-start+1) {
-            sorted.add(left.get(i++));
-            k++;
+        while (i < left.length && k < end-start+1) {
+            sorted[k++] = left[i++];
         }
-        while (j < right.size() && k < end-start+1) {
-            sorted.add(right.get(j++));
-            k++;
+        while (j < right.length && k < end-start+1) {
+            sorted[k++] = right[j++];
         }
 
         return sorted;

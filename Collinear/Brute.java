@@ -31,13 +31,9 @@ public class Brute {
 
     public void compare() {
         for (int i = 0; i+1 < N; i++) {
-            //StdOut.println(i);
             for (int j = i+1; j+1 < N; j++) {
-                // StdOut.println(j);
                 for (int p = j + 1; p+1 < N; p++) {
-                    // StdOut.println(p);
                     for (int q = p + 1; q < N; q++) {
-                        // StdOut.println(q);
                         Point p0 = sortedpArray.get(i);
                         Point p1 = sortedpArray.get(j);
                         Point p2 = sortedpArray.get(p);
