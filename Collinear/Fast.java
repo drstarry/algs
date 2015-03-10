@@ -14,46 +14,34 @@ import java.util.*;
 public class Fast {
 
     private int N;
+    private Point[] pArray;
     private Point[] sortedpArray;
     private ArrayList<Point[]> collinearArray;
 
     private Fast(String filename) {
         In in = new In(filename);
         N = in.readInt();
+        pArray = new Point[N];
         sortedpArray = new Point[N];
         for (int i = 0; i < N; i++) {
             int x = in.readInt();
             int y = in.readInt();
             Point p = new Point(x, y);
-            sortedpArray[i] = p;
+            pArray[i] = p;
         }
         collinearArray = new ArrayList<Point[]>();
-        sortedpArray = sortByPoint(sortedpArray, 0, sortedpArray.length - 1);
+        pArray = sortByPoint(pArray, 0, pArray.length - 1);
     }
-
-    // shuffle the array to get better performance
-    // private void shuffle(ArrayList<Point> arr) {
-    //     int index;
-    //     Point temp;
-    //     Random random = new Random();
-    //     for (int i = arr.length - 1; i > 0; i--)
-    //     {
-    //         index = random.nextInt(i + 1);
-    //         temp = arr.get(index);
-    //         arr.set(index, arr[i]);
-    //         arr.set(i, temp);
-    //     }
-    // }
 
     private void compute() {
         //shuffle(sortedpArray);
         for (int i = 0; i+1 < N; i++) {
-            Point p0 = sortedpArray[i]; // the current origin point
+            Point p0 = pArray[i]; // the current origin point
+            System.arraycopy(pArray, 0, sortedpArray, 0, N);
             Arrays.sort(sortedpArray, i+1, N-1, p0.SLOPE_ORDER);
             int low=i+1, high=i+2, cmp = 1, j = i+1;
             while (high < N) {
                 cmp = p0.SLOPE_ORDER.compare(sortedpArray[low], sortedpArray[high]);
-                // /
                 if (cmp==0 && high == N-1) {
                     if (high-low>=2) {
                         addResult(p0, low, high);
@@ -67,7 +55,6 @@ public class Fast {
                 }
                 high++;
             }
-            sortedpArray = sortByPoint(sortedpArray, 0, sortedpArray.length - 1);
         }
     }
 
@@ -78,8 +65,9 @@ public class Fast {
         for (int i = 1; i < group.length; i++, start++) {
             group[i] = sortedpArray[start];
         }
+        sortByPoint(group, 0, group.length-1);
         for (Point[] oldGroup: collinearArray) {
-            if (oldGroup[0].SLOPE_ORDER.compare(group[0], group[1]) == 0 && oldGroup[1].SLOPE_ORDER.compare(group[0], group[1]) == 0) {
+            if (oldGroup[0].slopeTo(oldGroup[1]) == group[0].slopeTo(group[1]) && oldGroup[0].SLOPE_ORDER.compare(group[group.length-1], group[group.length-2]) == 0) {
                 if (oldGroup.length < group.length) {
                     collinearArray.remove(oldGroup);
                 }
@@ -89,7 +77,6 @@ public class Fast {
             }
         }
         if (!hasGroup) {
-            sortByPoint(group, 0, group.length-1);
             collinearArray.add(group);
         }
     }
