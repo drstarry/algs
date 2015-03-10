@@ -76,6 +76,9 @@ public class Point implements Comparable<Point> {
         if (this.y < that.y || this.y == that.y && this.x < that.x) {
             return -1;
         }
+        if (this.y == that.y && this.x == that.x) {
+            return 0;
+        }
         else
             return 1;
     }
@@ -91,12 +94,12 @@ public class Point implements Comparable<Point> {
         Point p1 = new Point(0, 0);
         Point p2 = new Point(1, 2);
         Point p3 = new Point(0, 1);
-        Point p4 = new Point(0, 0);
-        Point p5 = new Point(0, 0);
+        Point p4 = new Point(2, 3);
+        Point p5 = new Point(2, 3);
         StdOut.println(p1.slopeTo(p2));
         StdOut.println(p1.slopeTo(p3));
         StdOut.println(p1.slopeTo(p4));
-        StdOut.println(p1.slopeTo(p5));
+        StdOut.println(p4.compareTo(p5));
         StdOut.println(p1.SLOPE_ORDER.compare(null,p4));
 
     }

@@ -57,13 +57,16 @@ public class Brute {
         StdDraw.setYscale(0, 32768);
         StdDraw.show(0);
         StdDraw.setPenRadius(0.01);  // make the points a bit larger
-        for (Point p: sortedpArray) {
-            p.draw();
-        }
 
-        for (int[] group: collinearArray) {
-            sortedpArray.get(group[0]).drawTo(sortedpArray.get(group[3]));
-        }
+        if (collinearArray.size() > 0)
+            for (Point p: sortedpArray) {
+                p.draw();
+            }
+
+        if (collinearArray.length > 0)
+            for (int[] group: collinearArray) {
+                sortedpArray.get(group[0]).drawTo(sortedpArray.get(group[3]));
+            }
 
         //display to screen all at once
         StdDraw.show(0);
