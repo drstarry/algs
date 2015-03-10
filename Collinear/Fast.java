@@ -133,7 +133,7 @@ public class Fast {
         StdDraw.show(0);
         StdDraw.setPenRadius(0.01);  // make the points a bit larger
 
-        if (collinearArray.size() > 0)
+        if (sortedpArray.length > 0)
             for (Point p: sortedpArray) {
                 p.draw();
             }
