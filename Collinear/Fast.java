@@ -30,16 +30,16 @@ public class Fast {
             pArray[i] = p;
         }
         collinearArray = new ArrayList<Point[]>();
-        pArray = sortByPoint(pArray, 0, pArray.length - 1);
+        Arrays.sort(pArray, new PointComparator());
     }
 
     private void compute() {
-        //shuffle(sortedpArray);
-        for (int i = 0; i+1 < N; i++) {
+        Collections.shuffle(Arrays.asList(sortedpArray));
+        for (int i = 0; i < N; i++) {
             Point p0 = pArray[i]; // the current origin point
-            System.arraycopy(pArray, 0, sortedpArray, 0, N);
-            Arrays.sort(sortedpArray, i+1, N-1, p0.SLOPE_ORDER);
-            int low=i+1, high=i+2, cmp = 1, j = i+1;
+            sortedpArray = pArray.clone();
+            Arrays.sort(sortedpArray, 0, N-1, p0.SLOPE_ORDER);
+            int low = 0, high = 1, cmp = 1, j = 0;
             while (high < N) {
                 cmp = p0.SLOPE_ORDER.compare(sortedpArray[low], sortedpArray[high]);
                 if (cmp==0 && high == N-1) {
@@ -58,25 +58,43 @@ public class Fast {
         }
     }
 
+    @SuppressWarnings("hiding")
+    private class PointComparator implements Comparator<Point> {
+        @Override
+        public int compare(Point p1, Point p2) {
+            return p1.compareTo(p2);
+        }
+    }
+
     private void addResult(Point p0, int start, int end) {
         Point[] group = new Point[end-start+2];
-        group[0] = p0;
         boolean hasGroup = false;
-        for (int i = 1; i < group.length; i++, start++) {
-            group[i] = sortedpArray[start];
+        boolean hasPivot = false;
+        boolean hasGroupSub = false;
+        for (int i = 0; i < group.length-1 && start <= end; i++, start++) {
+                group[i] = sortedpArray[start];
         }
-        sortByPoint(group, 0, group.length-1);
-        for (Point[] oldGroup: collinearArray) {
-            if (oldGroup[0].slopeTo(oldGroup[1]) == group[0].slopeTo(group[1]) && oldGroup[0].SLOPE_ORDER.compare(group[group.length-1], group[group.length-2]) == 0) {
-                if (oldGroup.length < group.length) {
-                    collinearArray.remove(oldGroup);
+        group[group.length-1] = p0;
+        Collections.shuffle(Arrays.asList(group));
+        Arrays.sort(group, new PointComparator());
+        Point[] temp = new Point[N];
+        if (collinearArray.size() != 0) {
+            for (Point[] oldGroup: collinearArray) {
+                if (oldGroup[0].slopeTo(oldGroup[1]) == group[0].slopeTo(group[1]) && oldGroup[0].SLOPE_ORDER.compare(group[group.length-1], group[group.length-2]) == 0) {
+                    if (oldGroup.length < group.length) {
+                        temp = oldGroup;
+                        hasGroupSub = true;
+                    }
+                    else
+                        hasGroup = true;
+                    break;
                 }
-                else
-                    hasGroup = true;
-                break;
             }
         }
         if (!hasGroup) {
+            if (hasGroupSub) {
+                collinearArray.remove(temp);
+            }
             collinearArray.add(group);
         }
     }

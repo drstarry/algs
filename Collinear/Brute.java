@@ -9,24 +9,29 @@ import java.util.*;
 public class Brute {
 
     private int N;
-    private ArrayList<Point> pArray;
-    //private int[] sortedpArray;
-    private ArrayList<Point> sortedpArray;
+    private Point[] sortedpArray;
     private ArrayList<int[]> collinearArray;
 
     private Brute(String filename) {
         In in = new In(filename);
         N = in.readInt();
-        pArray = new ArrayList<Point>(N);
+        sortedpArray = new Point[N];
         for (int i = 0; i < N; i++) {
             int x = in.readInt();
             int y = in.readInt();
             Point p = new Point(x, y);
-            pArray.add(p);
+            sortedpArray[i] = p;
         }
         collinearArray = new ArrayList<int[]>();
-        sortedpArray = new ArrayList<Point>(N);
-        sortedpArray = sort(pArray, 0, pArray.size() - 1);
+        Arrays.sort(sortedpArray, new PointComparator());
+    }
+
+    @SuppressWarnings("hiding")
+    private class PointComparator implements Comparator<Point> {
+        @Override
+        public int compare(Point p1, Point p2) {
+            return p1.compareTo(p2);
+        }
     }
 
     private void compare() {
@@ -34,10 +39,10 @@ public class Brute {
             for (int j = i+1; j+1 < N; j++) {
                 for (int p = j + 1; p+1 < N; p++) {
                     for (int q = p + 1; q < N; q++) {
-                        Point p0 = sortedpArray.get(i);
-                        Point p1 = sortedpArray.get(j);
-                        Point p2 = sortedpArray.get(p);
-                        Point p3 = sortedpArray.get(q);
+                        Point p0 = sortedpArray[i];
+                        Point p1 = sortedpArray[j];
+                        Point p2 = sortedpArray[p];
+                        Point p3 = sortedpArray[q];
                         if (p0.SLOPE_ORDER.compare(p1,p2) == 0 && p0.SLOPE_ORDER.compare(p2,p3) == 0 ) {
                             int[] group = new int[4];
                             group[0] = i;
@@ -58,14 +63,14 @@ public class Brute {
         StdDraw.show(0);
         StdDraw.setPenRadius(0.01);  // make the points a bit larger
 
-        if (sortedpArray.size() > 0)
+        if (sortedpArray.length > 0)
             for (Point p: sortedpArray) {
                 p.draw();
             }
 
         if (collinearArray.size() > 0)
             for (int[] group: collinearArray) {
-                sortedpArray.get(group[0]).drawTo(sortedpArray.get(group[3]));
+                sortedpArray[group[0]].drawTo(sortedpArray[group[3]]);
             }
 
         //display to screen all at once
@@ -77,44 +82,12 @@ public class Brute {
 
     private void output() {
         for (int[] sortedGroup: collinearArray) {
-            StdOut.print(sortedpArray.get(sortedGroup[0]).toString());
+            StdOut.print(sortedpArray[sortedGroup[0]].toString());
             for (int i = 1; i < 4; i++) {
-                StdOut.print(" -> " + sortedpArray.get(sortedGroup[i]).toString());
+                StdOut.print(" -> " + sortedpArray[sortedGroup[i]].toString());
             }
             StdOut.print("\n");
         }
-    }
-
-    private ArrayList<Point> sort(ArrayList<Point> array, int start, int end) {
-        if (end == start) {
-            return new ArrayList<Point>(Arrays.asList(array.get(start)));
-        }
-        int half = (start + end)/2;
-        ArrayList<Point> left = sort(array, start, half);
-        ArrayList<Point> right = sort(array, half+1, end);
-
-        ArrayList<Point> sorted = new ArrayList<Point>(end-start+1);
-        int i = 0, j = 0, k = 0;
-        while (i < left.size() && j < right.size() && k < end-start+1) {
-            if (left.get(i).compareTo(right.get(j)) == -1) {
-                sorted.add(left.get(i++));
-                k++;
-            }
-            else {
-                sorted.add(right.get(j++));
-                k++;
-            }
-        }
-        while (i < left.size() && k < end-start+1) {
-            sorted.add(left.get(i++));
-            k++;
-        }
-        while (j < right.size() && k < end-start+1) {
-            sorted.add(right.get(j++));
-            k++;
-        }
-
-        return sorted;
     }
 
     public static void main(String[] args) {

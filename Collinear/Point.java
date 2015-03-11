@@ -51,7 +51,7 @@ public class Point implements Comparable<Point> {
     // slope between this point and that point
     //The slopeTo() method should return the slope between the invoking point (x0, y0) and the argument point (x1, y1), which is given by the formula (y1 − y0) / (x1 − x0). Treat the slope of a horizontal line segment as positive zero; treat the slope of a vertical line segment as positive infinity; treat the slope of a degenerate line segment (between a point and itself) as negative infinity.
     public double slopeTo(Point that) {
-        if (that == null) {
+        if (that == null || this == null) {
             throw new NullPointerException();
         }
         if (that.x == this.x && that.y == this.y) {
