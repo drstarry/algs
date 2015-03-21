@@ -56,11 +56,7 @@ public class Board {
 
     // is this board the goal board?
     public boolean isGoal()  {
-        for (int i = 0; i <= dimension(); i++)
-            for (int j = 0; j <= dimension(); j++)
-                if (board[i][j] != 0 && !self(i, j))
-                    return false;
-        return true;
+        return hamming()==0;
     }
 
     private boolean self(int i, int j) {
