@@ -63,15 +63,21 @@ public class Board {
         return board[i][j] == i * dimension() + j + 1;
     }
 
-    // a boadr that is obtained by exchanging two adjacent blocks in the same row
+    // a boad that is obtained by exchanging two adjacent blocks in the same row
     public Board twin() {
         int[][] twin_board = new int[dimension()][dimension()];
         for (int i = 0; i < dimension(); i++)
-            for (int j = 0; j < dimension(); j++)
+            for (int j = 0; j < dimension()-1; j++)
                 twin_board[i][j] = board[i+1][j+1];
-        int temp = twin_board[0][0];
-        twin_board[0][0] = twin_board[0][1];
-        twin_board[0][1] = temp;
+        for (int i = 0; i < dimension(); i++)
+            for (int j = 0; j < dimension()-1; j++) {
+                if (twin_board[i][j]!=0 && twin_board[i][j+1]!=0) {
+                    int temp = twin_board[i][j];
+                    twin_board[i][j] = twin_board[i][j+1];
+                    twin_board[i][j+1] = temp;
+                    break;
+                }
+            }
         return new Board(twin_board);
     }
 
