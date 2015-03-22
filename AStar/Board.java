@@ -12,6 +12,7 @@ public class Board {
 
     private int[][] board;
     private int N;
+    private Set<String> steps;
 
     public Board(int[][] blocks) {
         if (blocks == null) {
@@ -19,6 +20,7 @@ public class Board {
         }
         N = blocks[0].length;
         board = new int[N][N];
+        steps = new HashSet<String>();
         for (int i = 0; i < N; i++)
             for (int j = 0; j < N; j++)
                 board[i][j] = blocks[i][j];
@@ -117,13 +119,13 @@ public class Board {
         private void getNeighbors(int i0, int j0, int[][] board) {
             int N = dimension();
             List<int[]> blockNeighbors = new ArrayList<int[]>();
-            if (i0-1 > 0) {
+            if (i0-1 >= 0) {
                 blockNeighbors.add(new int[]{i0-1,j0});
             }
             if (i0+1 < N) {
                 blockNeighbors.add(new int[]{i0+1,j0});
             }
-            if (j0-1 > 0) {
+            if (j0-1 >= 0) {
                 blockNeighbors.add(new int[]{i0,j0-1});
             }
             if (j0+1 < N) {
@@ -140,7 +142,9 @@ public class Board {
                 int temp = blocks[_i][_j];
                 blocks[_i][_j] = blocks[i0][j0];
                 blocks[i0][j0] = temp;
-                boardNeighbors.add(new Board(blocks));
+                Board b = new Board(blocks);
+                if (!steps.contains(b.toString()))
+                    boardNeighbors.add(b);
             }
         }
     }
@@ -167,11 +171,11 @@ public class Board {
             for (int j = 0; j < N; j++) {
                 blocks[i][j] = in.readInt();
             }
-        Board board = new Board(null);
-        blocks[0][0] = 23;
-        Board _board = new Board(blocks);
-        StdOut.print(board.toString());
-        StdOut.print(board.equals(_board));
-        StdOut.print(_board.toString());
+        Board board = new Board(blocks);
+        for (Board b: board.neighbors()) {
+            for (Board bb: b.neighbors()) {
+                StdOut.print(bb);
+            }
+        }
     }
 }
