@@ -17,8 +17,16 @@ public class Solver {
         private boolean isSolvable;
         private Map<String, Board> boardMap;
 
-        public GameTree(Board initial) {
-            if (initial == null) {
+        private MinPQ<SearchNode> priorityPQTwin; // a minpq to track search node
+        private Map<String, String> comeFromTwin; // a map to track the optimal path
+        private Map<String, Integer> costSoFarTwin; // a list to track current moves
+        private int moveNumTwin;
+        private String goalTwin;
+        private boolean isSolvableTwin;
+        private Map<String, Board> boardMapTwin;
+
+        public GameTree(Board initial, Board initialTwin) {
+            if (initial == null || initialTwin == null) {
                 throw new NullPointerException();
             }
             moveNum = -1;
@@ -33,17 +41,38 @@ public class Solver {
             String first = initial.toString().intern();
             boardMap.put(first, initial);
             comeFrom.put(first, null);
+
+            moveNumTwin = -1;
+            comeFromTwin = new HashMap<String, String>();
+            costSoFarTwin = new HashMap<String, Integer>();
+            priorityPQTwin = new MinPQ<SearchNode>();
+            boardMapTwin = new HashMap<String, Board>();
+            SearchNode startTwin = new SearchNode(initialTwin, 0, 0);
+            priorityPQTwin.insert(startTwin);
+            costSoFarTwin.put(initialTwin.toString().intern(), 0);
+            isSolvableTwin = false;
+            String firstTwin = initialTwin.toString().intern();
+            boardMapTwin.put(firstTwin, initialTwin);
+            comeFromTwin.put(firstTwin, null);
         }
 
-        public boolean aStar() {
-            while (!priorityPQ.isEmpty()) {
+        public void aStar() {
+            while (!priorityPQ.isEmpty() && !priorityPQTwin.isEmpty()) {
                 SearchNode current = priorityPQ.delMin();
                 Board curBoard = current.getCurBoard();
+                SearchNode currentTwin = priorityPQTwin.delMin();
+                Board curBoardTwin = currentTwin.getCurBoard();
 
                 if (curBoard.isGoal()) {
                     goal = curBoard.toString().intern();
                     moveNum = current.getCurMove();
                     isSolvable = true;
+                    break;
+                }
+                if (curBoardTwin.isGoal()) {
+                    goalTwin = curBoardTwin.toString().intern();
+                    moveNumTwin = currentTwin.getCurMove();
+                    isSolvableTwin = true;
                     break;
                 }
 
@@ -63,8 +92,24 @@ public class Solver {
 
                     }
                 }
+
+                int curMoveTwin = currentTwin.getCurMove() + 1;
+                for (Board nextBoardTwin: curBoardTwin.neighbors()) {
+
+                    if (costSoFarTwin.get(nextBoardTwin.toString().intern())==null || curMoveTwin < costSoFarTwin.get(nextBoardTwin.toString().intern())) {
+
+                        int priorityTwin = nextBoardTwin.manhattan() + curMoveTwin;
+                         // + nextBoard.hamming();
+                        SearchNode nextTwin = new SearchNode(nextBoardTwin, priorityTwin, curMoveTwin);
+                        priorityPQTwin.insert(nextTwin);
+                        comeFrom.put(nextBoardTwin.toString().intern(), curBoardTwin.toString().intern());
+                        costSoFarTwin.put(nextBoardTwin.toString().intern(), curMove);
+
+                        boardMapTwin.put(nextBoardTwin.toString().intern(), nextBoardTwin);
+
+                    }
+                }
             }
-            return isSolvable;
         }
 
         public int minStep() {
@@ -72,6 +117,10 @@ public class Solver {
                 return moveNum;
             else
                 return -1;
+        }
+
+        public boolean isSolvable() {
+            return isSolvable;
         }
 
         public List<Board> boardTree() {
@@ -131,14 +180,16 @@ public class Solver {
 
     private int moveMin;
     private List<Board> solutionTree;
+    private boolean isSolvable;
     public Solver(Board initial) {
         if (initial == null) {
             throw new NullPointerException();
         }
-        // Board initialTwin = initial.twin();
+        Board initialTwin = initial.twin();
 
-        GameTree tree = new GameTree(initial);
+        GameTree tree = new GameTree(initial, initialTwin);
         tree.aStar();
+        isSolvable = tree.isSolvable();
         moveMin = tree.minStep();
         solutionTree = tree.boardTree();
 
@@ -149,7 +200,7 @@ public class Solver {
 
     //is the initial board solvable?
     public boolean isSolvable() {
-        return moveMin != -1;
+        return isSolvable;
     }
 
     // min number of moves to solve initial board; -1 if unsolvable
