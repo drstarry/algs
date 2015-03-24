@@ -83,8 +83,11 @@ public class Board {
 
     // does this board equal y?
     public boolean equals(Object y) {
-        if (this == null || y == null) {
+        if (this == null && y == null) {
             throw new NullPointerException();
+        }
+        if (this == null || y == null) {
+            return false;
         }
         return toString().equals(y.toString());
     }
