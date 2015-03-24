@@ -7,7 +7,7 @@ import java.util.*;
 
 public class Solver {
     // find a solution to the initial board (using the A* algorithm)
-
+    @SuppressWarnings("hiding")
     private class GameTree {
         private MinPQ<SearchNode> priorityPQ; // a minpq to track search node
         private Map<String, String> comeFrom; // a map to track the optimal path
@@ -18,6 +18,9 @@ public class Solver {
         private Map<String, Board> boardMap;
 
         public GameTree(Board initial) {
+            if (initial == null) {
+                throw new NullPointerException();
+            }
             moveNum = -1;
             comeFrom = new HashMap<String, String>();
             costSoFar = new HashMap<String, Integer>();
@@ -84,6 +87,7 @@ public class Solver {
 
     }
 
+    @SuppressWarnings("hiding")
     private class SearchNode implements Comparable<SearchNode> {
         private Board current;
         private Integer priority;
@@ -91,6 +95,10 @@ public class Solver {
 
         public SearchNode(Board current, int priority, int moveNum)
         {
+            if (current == null) {
+                throw new NullPointerException();
+            }
+
             this.current = current;
             this.priority = priority;
             this.moveNum = moveNum;
@@ -126,7 +134,10 @@ public class Solver {
 
         @Override
         public boolean equals(Object n) {
-            return this.toString() == n.toString();
+            if (n == null) {
+                throw new NullPointerException();
+            }
+            return this.toString().equals(n.toString());
         }
 
     }
@@ -137,7 +148,7 @@ public class Solver {
         if (initial == null) {
             throw new NullPointerException();
         }
-        Board initialTwin = initial.twin();
+        // Board initialTwin = initial.twin();
 
         GameTree tree = new GameTree(initial);
         tree.aStar();
