@@ -49,7 +49,8 @@ public class Solver {
 
                     if (costSoFar.get(nextBoard.toString().intern())==null || curMove < costSoFar.get(nextBoard.toString().intern())) {
 
-                        int priority = nextBoard.manhattan() + curMove + nextBoard.hamming();
+                        int priority = nextBoard.manhattan() + curMove;
+                         // + nextBoard.hamming();
                         SearchNode next = new SearchNode(nextBoard, priority, curMove);
                         priorityPQ.insert(next);
                         comeFrom.put(nextBoard.toString().intern(), curBoard.toString().intern());
@@ -73,13 +74,11 @@ public class Solver {
         public List<Board> boardTree() {
             List<Board> tree = new ArrayList<Board>();
             String cur = goal;
-            StdOut.println(comeFrom.get(cur));
             while (cur != null) {
                 tree.add(boardMap.get(cur));
                 cur = comeFrom.get(cur);
             }
             Collections.reverse(tree);
-            StdOut.println(comeFrom);
             return tree;
         }
 
@@ -143,13 +142,11 @@ public class Solver {
         GameTree tree = new GameTree(initial);
         tree.aStar();
         moveMin = tree.minStep();
-        StdOut.print(moveMin);
         solutionTree = tree.boardTree();
 
+        // I don't even know why we use such twin??
         // GameTree treeTwin = new GameTree(initialTwin);
-        // StdOut.println(treeTwin.aStar());
-        // StdOut.println(treeTwin.minStep());
-
+        // treeTwin.aStar();
     }
 
     //is the initial board solvable?
@@ -179,7 +176,6 @@ public class Solver {
                 blocks[i][j] = in.readInt();
         Board initial = new Board(blocks);
 
-        StdOut.print(initial);
         // solve the puzzle
         Solver solver = new Solver(initial);
 
