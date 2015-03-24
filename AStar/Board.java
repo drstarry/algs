@@ -49,7 +49,7 @@ public class Board {
             for (int j = 0; j < dimension(); j++)
                 if (board[i][j] != 0 && !self(i, j)) {
                     int _i = board[i][j]/dimension();
-                    int _j = board[i][j] - _i*dimension();
+                    int _j = board[i][j] - _i*dimension() - 1;
                     int dis = Math.abs(i-_i) + Math.abs(j-_j);
                     distance += dis;
                 }
@@ -58,7 +58,7 @@ public class Board {
 
     // is this board the goal board?
     public boolean isGoal()  {
-        return hamming()==0;
+        return manhattan() == 0;
     }
 
     private boolean self(int i, int j) {
@@ -69,8 +69,8 @@ public class Board {
     public Board twin() {
         int[][] twin_board = new int[dimension()][dimension()];
         for (int i = 0; i < dimension(); i++)
-            for (int j = 0; j < dimension()-1; j++)
-                twin_board[i][j] = board[i+1][j+1];
+            for (int j = 0; j < dimension(); j++)
+                twin_board[i][j] = board[i][j];
         for (int i = 0; i < dimension(); i++)
             for (int j = 0; j < dimension()-1; j++) {
                 if (twin_board[i][j]!=0 && twin_board[i][j+1]!=0) {
@@ -151,7 +151,7 @@ public class Board {
 
     // string representation of this board (in the output format specified below)
     public String toString() {
-        String str = "";
+        String str = dimension() + "\n";
         for (int i = 0; i < dimension(); i++) {
             for (int j = 0; j < dimension(); j++) {
                 str += board[i][j];
@@ -174,6 +174,8 @@ public class Board {
         Board board = new Board(blocks);
         for (Board b: board.neighbors()) {
             for (Board bb: b.neighbors()) {
+                StdOut.println("!!!");
+                StdOut.println(bb.manhattan());
                 StdOut.print(bb);
             }
         }
