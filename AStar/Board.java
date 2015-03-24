@@ -77,7 +77,7 @@ public class Board {
                     int temp = twin_board[i][j];
                     twin_board[i][j] = twin_board[i][j+1];
                     twin_board[i][j+1] = temp;
-                    break;
+                    return new Board(twin_board);
                 }
             }
         return new Board(twin_board);
@@ -172,7 +172,8 @@ public class Board {
                 blocks[i][j] = in.readInt();
             }
         Board board = new Board(blocks);
-        StdOut.println(board.manhattan());
+        StdOut.println(board);
+        StdOut.println(board.twin());
         // for (Board b: board.neighbors()) {
         //     for (Board bb: b.neighbors()) {
         //         StdOut.println("!!!");
