@@ -210,7 +210,10 @@ public class Solver {
 
     // sequence of boards in a shortest solution; null if unsolvable
     public Iterable<Board> solution() {
-        return solutionTree;
+        if (isSolvable)
+            return solutionTree;
+        else
+            return null;
     }
 
     // solve a slider puzzle (given below)
