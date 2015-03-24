@@ -12,7 +12,6 @@ public class Board {
 
     private int[][] board;
     private int N;
-    private Set<String> steps;
 
     public Board(int[][] blocks) {
         if (blocks == null) {
@@ -20,7 +19,6 @@ public class Board {
         }
         N = blocks[0].length;
         board = new int[N][N];
-        steps = new HashSet<String>();
         for (int i = 0; i < N; i++)
             for (int j = 0; j < N; j++)
                 board[i][j] = blocks[i][j];
@@ -85,7 +83,7 @@ public class Board {
 
     // does this board equal y?
     public boolean equals(Object y) {
-        if (y == null) {
+        if (this == null || y == null) {
             throw new NullPointerException();
         }
         return toString().equals(y.toString());
@@ -146,8 +144,7 @@ public class Board {
                 blocks[_i][_j] = blocks[i0][j0];
                 blocks[i0][j0] = temp;
                 Board b = new Board(blocks);
-                if (!steps.contains(b.toString()))
-                    boardNeighbors.add(b);
+                boardNeighbors.add(b);
             }
         }
     }
@@ -176,7 +173,7 @@ public class Board {
             }
         Board board = new Board(blocks);
         StdOut.println(board);
-        StdOut.println(board.twin());
+        StdOut.println(board.equals("123"));
         // for (Board b: board.neighbors()) {
         //     for (Board bb: b.neighbors()) {
         //         StdOut.println("!!!");

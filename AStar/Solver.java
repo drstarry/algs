@@ -127,19 +127,6 @@ public class Solver {
             return 0;
         }
 
-        @Override
-        public String toString() {
-            return priority+" ";
-        }
-
-        @Override
-        public boolean equals(Object n) {
-            if (n == null) {
-                throw new NullPointerException();
-            }
-            return this.toString().equals(n.toString());
-        }
-
     }
 
     private int moveMin;
