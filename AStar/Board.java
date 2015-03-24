@@ -52,7 +52,6 @@ public class Board {
                     int _j = board[i][j] - _i*dimension() - 1;
                     int dis = Math.abs(i-_i) + Math.abs(j-_j);
                     distance += dis;
-                    StdOut.println(dis + " " + i + " " + j + " " + board[i][j]);
                 }
         return distance;
     }
