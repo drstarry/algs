@@ -36,7 +36,7 @@ public class Board {
         int num = 0;
         for (int i = 0; i < dimension(); i++)
             for (int j = 0; j < dimension(); j++)
-                if (!self(i, j)) {
+                if (board[i][j] != 0 && !self(i, j)) {
                     num ++;
                 }
         return num;
@@ -48,10 +48,11 @@ public class Board {
         for (int i = 0; i < dimension(); i++)
             for (int j = 0; j < dimension(); j++)
                 if (board[i][j] != 0 && !self(i, j)) {
-                    int _i = board[i][j]/dimension();
+                    int _i = (board[i][j] - 1)/dimension();
                     int _j = board[i][j] - _i*dimension() - 1;
                     int dis = Math.abs(i-_i) + Math.abs(j-_j);
                     distance += dis;
+                    StdOut.println(dis + " " + i + " " + j + " " + board[i][j]);
                 }
         return distance;
     }
@@ -172,12 +173,13 @@ public class Board {
                 blocks[i][j] = in.readInt();
             }
         Board board = new Board(blocks);
-        for (Board b: board.neighbors()) {
-            for (Board bb: b.neighbors()) {
-                StdOut.println("!!!");
-                StdOut.println(bb.manhattan());
-                StdOut.print(bb);
-            }
-        }
+        StdOut.println(board.manhattan());
+        // for (Board b: board.neighbors()) {
+        //     for (Board bb: b.neighbors()) {
+        //         StdOut.println("!!!");
+        //         StdOut.println(bb.manhattan());
+        //         StdOut.print(bb);
+        //     }
+        // }
     }
 }
