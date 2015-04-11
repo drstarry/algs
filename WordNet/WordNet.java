@@ -15,36 +15,111 @@
 // 164,21012,56099
 // means that the the synset 164 ("Actifed") has two hypernyms: 21012 ("antihistamine") and 56099 ("nasal_decongestant"), representing that Actifed is both an antihistamine and a nasal decongestant. The synsets are obtained from the corresponding lines in the file synsets.txt.
 
+import java.lang.NullPointerException;
+import java.util.Hashtable;
+
 public class WordNet {
 
+   private Hashtable<Integer, Bag<String>> int2strMap;
+   private Hashtable<String, Bag<Integer>> str2intMap;
+   private Graph wordNet;
+   // private SAP sap;
    // constructor takes the name of the two input files
    public WordNet(String synsets, String hypernyms) {
+      if (synsets == null || hypernyms == null) {
+         throw new NullPointerException();
+      }
+      In syn = new In(synsets);
+      In hyp = new In(hypernyms);
+      int vNum = 0;
+      int2strMap = new Hashtable<Integer, Bag<String>>();
+      str2intMap = new Hashtable<String, Bag<Integer>>();
 
+      while (syn.hasNextLine()) {
+         vNum ++;
+         String[] parts = syn.readLine().split(",");
+         int id = Integer.parseInt(parts[0]);
+         String[] words = parts[1].split(" ");
+
+         for (String word: words) {
+            Bag<Integer> bagInt = str2intMap.get(word);
+            if (bagInt == null) {
+               bagInt = new Bag<Integer>();
+               bagInt.add(id);
+               str2intMap.put(word, bagInt);
+            }
+            else {
+               bagInt.add(id);
+            }
+
+            Bag<String> bagStr = int2strMap.get(id);
+            if (bagStr == null) {
+               bagStr = new Bag<String>();
+               bagStr.add(word);
+               int2strMap.put(id, bagStr);
+            }
+            else {
+               bagStr.add(word);
+            }
+
+         }
+      }
+
+      wordNet = new Graph(vNum);
+      while (hyp.hasNextLine()) {
+         String[] virticles = hyp.readLine().split(",");
+         if (virticles.length < 2) {
+            continue;
+         }
+         int child = Integer.parseInt(virticles[0]);
+         for (int i = 1; i < virticles.length; i++) {
+            int ancestor = Integer.parseInt(virticles[i]);
+            wordNet.addEdge(child, ancestor);
+         }
+      }
+
+      // sap = new SAP(wordNet);
    }
 
+   // private String toString() {
+   //    return wordNet.toString();
+   // }
    // returns all WordNet nouns
    public Iterable<String> nouns() {
-
+      return str2intMap.keySet();
    }
 
    // is the word a WordNet noun?
    public boolean isNoun(String word) {
-
+      if (word == null) {
+         throw new NullPointerException();
+      }
+      return str2intMap.containsKey(word);
    }
 
-   // distance between nounA and nounB (defined below)
-   public int distance(String nounA, String nounB) {
+   // // distance between nounA and nounB (defined below)
+   // public int distance(String nounA, String nounB) {
+   //    if (nounA == null || nounB == null) {
+   //       throw new NullPointerException();
+   //    }
+   // }
 
-   }
-
-   // a synset (second field of synsets.txt) that is the common ancestor of nounA and nounB
-   // in a shortest ancestral path (defined below)
-   public String sap(String nounA, String nounB) {
-
-   }
+   // // a synset (second field of synsets.txt) that is the common ancestor of nounA and nounB
+   // // in a shortest ancestral path (defined below)
+   // public String sap(String nounA, String nounB) {
+   //    if (nounA == null || nounB == null) {
+   //       throw new NullPointerException();
+   //    }
+   // }
 
    // do unit testing of this class
    public static void main(String[] args) {
-
+      String syn = args[0];
+      String hyp = args[1];
+      StdOut.println(hyp);
+      WordNet w = new WordNet(syn, hyp);
+      for (String word: w.nouns()) {
+         StdOut.println(word);
+      }
    }
 }
