@@ -17,12 +17,13 @@
 
 import java.lang.NullPointerException;
 import java.lang.IllegalArgumentException;
+import java.util.ArrayList;
 import java.util.Hashtable;
 
 public class WordNet {
 
-   private Hashtable<Integer, Bag<String>> int2strMap;
-   private Hashtable<String, Bag<Integer>> str2intMap;
+   private Hashtable<Integer, ArrayList<String>> int2strMap;
+   private Hashtable<String, ArrayList<Integer>> str2intMap;
    private Digraph wordNet;
    private SAP sap;
    // constructor takes the name of the two input files
@@ -33,8 +34,8 @@ public class WordNet {
       In syn = new In(synsets);
       In hyp = new In(hypernyms);
       int vNum = 0;
-      int2strMap = new Hashtable<Integer, Bag<String>>();
-      str2intMap = new Hashtable<String, Bag<Integer>>();
+      int2strMap = new Hashtable<Integer, ArrayList<String>>();
+      str2intMap = new Hashtable<String, ArrayList<Integer>>();
 
       while (syn.hasNextLine()) {
          vNum ++;
@@ -43,24 +44,24 @@ public class WordNet {
          String[] words = parts[1].split(" ");
 
          for (String word: words) {
-            Bag<Integer> bagInt = str2intMap.get(word);
-            if (bagInt == null) {
-               bagInt = new Bag<Integer>();
-               bagInt.add(id);
-               str2intMap.put(word, bagInt);
+            ArrayList<Integer> arrInt = str2intMap.get(word);
+            if (arrInt == null) {
+               arrInt = new ArrayList<Integer>();
+               arrInt.add(id);
+               str2intMap.put(word, arrInt);
             }
             else {
-               bagInt.add(id);
+               arrInt.add(id);
             }
 
-            Bag<String> bagStr = int2strMap.get(id);
-            if (bagStr == null) {
-               bagStr = new Bag<String>();
-               bagStr.add(word);
-               int2strMap.put(id, bagStr);
+            ArrayList<String> arrStr = int2strMap.get(id);
+            if (arrStr == null) {
+               arrStr = new ArrayList<String>();
+               arrStr.add(word);
+               int2strMap.put(id, arrStr);
             }
             else {
-               bagStr.add(word);
+               arrStr.add(word);
             }
 
          }
@@ -125,8 +126,8 @@ public class WordNet {
       if (!isNoun(nounA) || !isNoun(nounB)) {
          throw new IllegalArgumentException();
       }
-      Bag<Integer> idA = str2intMap.get(nounA);
-      Bag<Integer> idB = str2intMap.get(nounB);
+      ArrayList<Integer> idA = str2intMap.get(nounA);
+      ArrayList<Integer> idB = str2intMap.get(nounB);
       return sap.length(idA, idB);
    }
 
@@ -139,8 +140,8 @@ public class WordNet {
       if (!isNoun(nounA) || !isNoun(nounB)) {
          throw new IllegalArgumentException();
       }
-      Bag<Integer> idA = str2intMap.get(nounA);
-      Bag<Integer> idB = str2intMap.get(nounB);
+      ArrayList<Integer> idA = str2intMap.get(nounA);
+      ArrayList<Integer> idB = str2intMap.get(nounB);
       int ancestor = sap.ancestor(idA, idB);
       if (ancestor == -1) {
          return null;
@@ -160,10 +161,10 @@ public class WordNet {
       String hyp = args[1];
       StdOut.println(hyp);
       WordNet w = new WordNet(syn, hyp);
-      for (String word: w.nouns()) {
-         StdOut.println(word);
-      }
-      StdOut.println(w.distance("qwe", "gluten"));
-      StdOut.println(w.sap("protein", "gluten"));
+      // for (String word: w.nouns()) {
+      //    StdOut.println(word);
+      // }
+      StdOut.println(w.distance("simple_sugar", "closed_chain"));
+      StdOut.println(w.sap("simple_sugar", "closed_chain"));
    }
 }
