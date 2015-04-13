@@ -1,6 +1,7 @@
 *.class
-*idea/
 *.zip
 *.png
-*Inversion/*.txt
-*collinear-testing
+*.txt
+*Collinear/collinear-testing
+*idea/
+*WordNet/wordnet
