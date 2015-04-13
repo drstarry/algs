@@ -92,10 +92,14 @@ public class WordNet {
       if (dc.hasCycle()) {
          return false;
       }
+      int rootNum = 0;
       for (int i = 0; i < g.V(); i++) {
          if (g.outdegree(i) == 0) {
-            return true;
+            rootNum++;
          }
+      }
+      if (rootNum == 1) {
+         return true;
       }
       return false;
    }
