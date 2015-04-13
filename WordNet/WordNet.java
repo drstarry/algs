@@ -16,14 +16,15 @@
 // means that the the synset 164 ("Actifed") has two hypernyms: 21012 ("antihistamine") and 56099 ("nasal_decongestant"), representing that Actifed is both an antihistamine and a nasal decongestant. The synsets are obtained from the corresponding lines in the file synsets.txt.
 
 import java.lang.NullPointerException;
+import java.lang.IllegalArgumentException;
 import java.util.Hashtable;
 
 public class WordNet {
 
    private Hashtable<Integer, Bag<String>> int2strMap;
    private Hashtable<String, Bag<Integer>> str2intMap;
-   private Graph wordNet;
-   // private SAP sap;
+   private Digraph wordNet;
+   private SAP sap;
    // constructor takes the name of the two input files
    public WordNet(String synsets, String hypernyms) {
       if (synsets == null || hypernyms == null) {
@@ -65,7 +66,7 @@ public class WordNet {
          }
       }
 
-      wordNet = new Graph(vNum);
+      wordNet = new Digraph(vNum);
       while (hyp.hasNextLine()) {
          String[] virticles = hyp.readLine().split(",");
          if (virticles.length < 2) {
@@ -78,12 +79,27 @@ public class WordNet {
          }
       }
 
-      // sap = new SAP(wordNet);
+      if (!isValidGraph(wordNet)) {
+         throw new IllegalArgumentException();
+      }
+
+      sap = new SAP(wordNet);
    }
 
-   // private String toString() {
-   //    return wordNet.toString();
-   // }
+   // dag && has root
+   private boolean isValidGraph(Digraph g) {
+      DirectedCycle dc = new DirectedCycle(g);
+      if (dc.hasCycle()) {
+         return false;
+      }
+      for (int i = 0; i < g.V(); i++) {
+         if (g.outdegree(i) == 0) {
+            return true;
+         }
+      }
+      return false;
+   }
+
    // returns all WordNet nouns
    public Iterable<String> nouns() {
       return str2intMap.keySet();
@@ -97,20 +113,42 @@ public class WordNet {
       return str2intMap.containsKey(word);
    }
 
-   // // distance between nounA and nounB (defined below)
-   // public int distance(String nounA, String nounB) {
-   //    if (nounA == null || nounB == null) {
-   //       throw new NullPointerException();
-   //    }
-   // }
+   // distance between nounA and nounB (defined below)
+   public int distance(String nounA, String nounB) {
+      if (nounA == null || nounB == null) {
+         throw new NullPointerException();
+      }
+      if (!isNoun(nounA) || !isNoun(nounB)) {
+         throw new IllegalArgumentException();
+      }
+      Bag<Integer> idA = str2intMap.get(nounA);
+      Bag<Integer> idB = str2intMap.get(nounB);
+      return sap.length(idA, idB);
+   }
 
-   // // a synset (second field of synsets.txt) that is the common ancestor of nounA and nounB
-   // // in a shortest ancestral path (defined below)
-   // public String sap(String nounA, String nounB) {
-   //    if (nounA == null || nounB == null) {
-   //       throw new NullPointerException();
-   //    }
-   // }
+   // a synset (second field of synsets.txt) that is the common ancestor of nounA and nounB
+   // in a shortest ancestral path (defined below)
+   public String sap(String nounA, String nounB) {
+      if (nounA == null || nounB == null) {
+         throw new NullPointerException();
+      }
+      if (!isNoun(nounA) || !isNoun(nounB)) {
+         throw new IllegalArgumentException();
+      }
+      Bag<Integer> idA = str2intMap.get(nounA);
+      Bag<Integer> idB = str2intMap.get(nounB);
+      int ancestor = sap.ancestor(idA, idB);
+      if (ancestor == -1) {
+         return null;
+      }
+      else {
+         String result = "";
+         for (String s: int2strMap.get(ancestor)) {
+            result += s + " ";
+         }
+         return result.trim();
+      }
+   }
 
    // do unit testing of this class
    public static void main(String[] args) {
@@ -121,5 +159,7 @@ public class WordNet {
       for (String word: w.nouns()) {
          StdOut.println(word);
       }
+      StdOut.println(w.distance("qwe", "gluten"));
+      StdOut.println(w.sap("protein", "gluten"));
    }
 }
