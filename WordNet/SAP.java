@@ -81,44 +81,44 @@ public class SAP {
             int ancestor = -1;
             int length = Integer.MAX_VALUE;
             int count = 0;
-            Hashtable<Integer, Integer> vVisited = new Hashtable<Integer, Integer>();
-            Hashtable<Integer, Integer> wVisited = new Hashtable<Integer, Integer>();
+            Queue<Integer> bfsQ = new Queue<Integer>();
+            bfsQ.enqueue(w);
 
             if (bfsV.hasPathTo(w)) {
                 v2wLen = bfsV.distTo(w);
+                length = v2wLen;
+                ancestor = w;
             }
             if (bfsW.hasPathTo(v)) {
                 w2vLen = bfsW.distTo(v);
+                if (w2vLen < length) {
+                    length = w2vLen;
+                    ancestor = v;
+                }
             }
-
-            do {
+            while (!bfsQ.isEmpty()) {
+                cur = bfsQ.dequeue();
+                count ++;
+                if (count > g.V()) {
+                    break;
+                }
+                StdOut.println("cur:" + cur);
                 if(bfsV.hasPathTo(cur)) {
-                    int curLen = bfsV.distTo(cur) + count;
+                    int curLen = bfsV.distTo(cur) + bfsW.distTo(cur);
+                    // StdOut.println("cur:" + cur + " len:" + curLen);
                     if (curLen < length) {
                         length = curLen;
                         ancestor = cur;
-                    } else if (curLen > length) {
-                        break;
                     }
                 }
-                if (g.outdegree(cur) == 0)
-                    break;
-                count ++;
-                if (count > g.E())
-                    break;
-                cur = firstOfIterable(g.adj(cur));
-            } while (cur != w);
+                for (int vAdj: g.adj(cur)) {
+                    bfsQ.enqueue(vAdj);
+                    // StdOut.println("adj:" + vAdj);
+                }
+            }
 
-            length = Math.min(length, Math.min(v2wLen, w2vLen));
-
-            if (length == Integer.MAX_VALUE) {
+            if (ancestor == -1) {
                 sapTable.put(id, new sapUnit(id, -1, -1));
-            }
-            else if (length == v2wLen) {
-                sapTable.put(id, new sapUnit(id, w, v2wLen));
-            }
-            else if (length == w2vLen) {
-                sapTable.put(id, new sapUnit(id, v, w2vLen));
             }
             else
                 sapTable.put(id, new sapUnit(id, ancestor, length));
