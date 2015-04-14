@@ -6,6 +6,7 @@
 import java.lang.IndexOutOfBoundsException;
 import java.lang.NullPointerException;
 import java.util.Hashtable;
+import java.util.HashSet;
 
 public class SAP {
 
@@ -80,9 +81,9 @@ public class SAP {
             int cur = w;
             int ancestor = -1;
             int length = Integer.MAX_VALUE;
-            int count = 0;
             Queue<Integer> bfsQ = new Queue<Integer>();
-            bfsQ.enqueue(w);
+            HashSet<Integer> visited = new HashSet<Integer>();
+            bfsQ.enqueue(cur);
 
             if (bfsV.hasPathTo(w)) {
                 v2wLen = bfsV.distTo(w);
@@ -98,8 +99,8 @@ public class SAP {
             }
             while (!bfsQ.isEmpty()) {
                 cur = bfsQ.dequeue();
-                count ++;
-                if (count > g.V()) {
+                visited.add(cur);
+                if (visited.size() > g.V()) {
                     break;
                 }
                 if(bfsV.hasPathTo(cur)) {
@@ -109,9 +110,14 @@ public class SAP {
                         length = curLen;
                         ancestor = cur;
                     }
+                    else if (curLen > length) {
+                        break;
+                    }
                 }
                 for (int vAdj: g.adj(cur)) {
-                    bfsQ.enqueue(vAdj);
+                    if (!visited.contains(vAdj)) {
+                        bfsQ.enqueue(vAdj);
+                    }
                     // StdOut.println("adj:" + vAdj);
                 }
             }
