@@ -102,7 +102,6 @@ public class SAP {
                 if (count > g.V()) {
                     break;
                 }
-                StdOut.println("cur:" + cur);
                 if(bfsV.hasPathTo(cur)) {
                     int curLen = bfsV.distTo(cur) + bfsW.distTo(cur);
                     // StdOut.println("cur:" + cur + " len:" + curLen);
