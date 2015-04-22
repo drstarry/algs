@@ -110,9 +110,9 @@ public class SAP {
                         length = curLen;
                         ancestor = cur;
                     }
-                    else if (curLen > length) {
-                        break;
-                    }
+                    // else if (curLen > length) {
+                    //     break;
+                    // }
                 }
                 for (int vAdj: g.adj(cur)) {
                     if (!visited.contains(vAdj)) {
