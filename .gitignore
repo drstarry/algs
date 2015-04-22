@@ -2,7 +2,8 @@
 *.zip
 *.png
 *.txt
-#AStar/8puzzle
+*AStar/8puzzle
 *Collinear/collinear-testing
 *idea/
 *WordNet/wordnet
+*SeamCarving/seamCarving
