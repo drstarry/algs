@@ -47,53 +47,104 @@
 
 // Thus, the energy of pixel (1, 2) is 41620 + 10404 = 52024. Similarly, the energy of pixel (1, 1) is 2042 + 1032 = 52225.
 
+import java.awt.Color;
 import java.lang.IllegalArgumentException;
 import java.lang.IndexOutOfBoundsException;
+import java.lang.Math;
 import java.lang.NullPointerException;
+import java.util.Hashtable;
 
 public class SeamCarver {
-    // create a seam carver object based on the given picture
-   public SeamCarver(Picture picture) {
 
+   Picture pic;
+   int width;
+   int height;
+   double[][] engGrid;
+
+   // create a seam carver object based on the given picture
+   public SeamCarver(Picture picture) {
+      pic = new Picture(picture);
+      width = pic.width();
+      height = pic.height();
+      engGrid = new double[height][width];
+      for (int col = 0; col < width; col ++)
+         for (int row = 0; row < height; row ++) {
+            engGrid[row][col] = computeEng(col, row);
+         }
    }
 
-    // current picture
-   public Picture picture() {
+   private double computeEng(int col, int row) {
+      double deltaX = 0.0, deltaY = 0.0;
+      Color x1, x2, y1, y2, nil = new Color(0, 0, 0);
+      x1 = (col == 0) ? nil : pic.get(col - 1, row);
+      x2 = (col == width - 1) ? nil : pic.get(col + 1, row);
+      y1 = (row == 0) ? nil : pic.get(col, row - 1);
+      y2 = (row == height - 1) ? nil : pic.get(col, row + 1);
+      deltaX += Math.pow((x1.getRed() - x2.getRed()), 2) + Math.pow((x1.getGreen() - x2.getGreen()), 2) + Math.pow((x1.getBlue() - x2.getBlue()), 2);
+      deltaY += Math.pow((y1.getRed() - y2.getRed()), 2) + Math.pow((y1.getGreen() - y2.getGreen()), 2) + Math.pow((y1.getBlue() - y2.getBlue()), 2);
+      return deltaX + deltaY;
+   }
 
+   // current picture
+   public Picture picture() {
+      return pic;
    }
 
    // width of current picture
    public int width() {
-
+      return width;
    }
 
    // height of current picture
    public int height() {
-
+      return height;
    }
 
    // energy of pixel at column x and row y
    public double energy(int x, int y) {
-
+      if (x < 0 || x >= width() || y < 0 || y >= height())
+         throw new IndexOutOfBoundsException();
+      return engGrid[y][x];
    }
 
-   // sequence of indices for horizontal seam
-   public int[] findHorizontalSeam() {
+   // private int[] shortestPath(String mode, ) {
 
-   }
+   // }
 
-   // sequence of indices for vertical seam
-   public int[] findVerticalSeam() {
+   // private
+   // // sequence of indices for horizontal seam
+   // public int[] findHorizontalSeam() {
 
-   }
+   // }
 
-   // remove horizontal seam from current picture
-   public void removeHorizontalSeam(int[] seam) {
+   // // sequence of indices for vertical seam
+   // public int[] findVerticalSeam() {
 
-   }
+   // }
 
-   // remove vertical seam from current picture
-   public void removeVerticalSeam(int[] seam) {
+   // private boolean isValidSeam(int[] seam) {
+   //    for (int i = 0; i < seam.length - 1; i++) {
+   //       if (Math.abs(seam[i] - seam[i + 1]) > 1)
+   //          return false;
+   //    }
+   //    return true;
+   // }
+
+   // // remove horizontal seam from current picture
+   // public void removeHorizontalSeam(int[] seam) {
+   //    if (width() <= 1 || height() <= 1 || seam.length < 0 || seam.length >= height || !isValidSeam(seam))
+   //       throw new IllegalArgumentException();
+   // }
+
+   // // remove vertical seam from current picture
+   // public void removeVerticalSeam(int[] seam) {
+   //    if (width() <= 1 || height() <= 1 || seam.length < 0 || seam.length >= width || !isValidSeam(seam))
+   //       throw new IllegalArgumentException();
+   // }
+
+   public static void main(String args[]) {
+      Picture inputImg = new Picture(args[0]);
+      SeamCarver sc = new SeamCarver(inputImg);
 
    }
 }
