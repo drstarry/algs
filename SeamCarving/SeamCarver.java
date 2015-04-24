@@ -51,7 +51,6 @@ import java.awt.Color;
 import java.lang.IllegalArgumentException;
 import java.lang.IndexOutOfBoundsException;
 import java.lang.Math;
-import java.lang.NullPointerException;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -71,42 +70,10 @@ public class SeamCarver {
       width = pic.width();
       height = pic.height();
       engGrid = new double[height][width];
-      for (int col = 0; col < width; col ++)
-         for (int row = 0; row < height; row ++) {
+      for (int col = 0; col < width; col++)
+         for (int row = 0; row < height; row++) {
             engGrid[row][col] = computeEng(col, row);
          }
-      for (int col = 0; col < width; col ++)
-         for (int row = 0; row < height; row ++) {
-            engGrid[row][col] = computeEng(col, row);
-         }
-   }
-
-   private class Node {
-
-      private int col, row;
-
-      public Node(int col, int row) {
-         this.col = col;
-         this.row = row;
-      }
-
-      public Node(String str) {
-         String[] parts = str.split(" ");
-         this.col = Integer.parseInt(parts[0]);
-         this.row = Integer.parseInt(parts[1]);
-      }
-
-      public int row() {
-         return row;
-      }
-
-      public int col() {
-         return col;
-      }
-
-      public String toString() {
-         return col + " " + row;
-      }
    }
 
    private double computeEng(int col, int row) {
@@ -118,8 +85,8 @@ public class SeamCarver {
       x2 = pic.get(col + 1, row);
       y1 = pic.get(col, row - 1);
       y2 = pic.get(col, row + 1);
-      deltaX += Math.pow((x1.getRed() - x2.getRed()), 2) + Math.pow((x1.getGreen() - x2.getGreen()), 2) + Math.pow((x1.getBlue() - x2.getBlue()), 2);
-      deltaY += Math.pow((y1.getRed() - y2.getRed()), 2) + Math.pow((y1.getGreen() - y2.getGreen()), 2) + Math.pow((y1.getBlue() - y2.getBlue()), 2);
+      deltaX = Math.pow((x1.getRed() - x2.getRed()), 2) + Math.pow((x1.getGreen() - x2.getGreen()), 2) + Math.pow((x1.getBlue() - x2.getBlue()), 2);
+      deltaY = Math.pow((y1.getRed() - y2.getRed()), 2) + Math.pow((y1.getGreen() - y2.getGreen()), 2) + Math.pow((y1.getBlue() - y2.getBlue()), 2);
       return deltaX + deltaY;
    }
 
@@ -146,99 +113,37 @@ public class SeamCarver {
       return engGrid[y][x];
    }
 
-   private class Seam implements Comparable<Seam>{
-      String mode;
-      int[] seam;
-      double eng;
-      String end;
-
-      public Seam(String mode, HashMap edgeTo, String end, double eng) {
-         this.mode = mode;
-         this.eng = eng;
-         this.end = end;
-         seam = getSeam(edgeTo);
+   private int[] getSeam(String mode, HashMap edgeTo, String end) {
+      int size;
+      if (mode.equals("h")) {
+         size = width();
       }
-
-      private int[] getSeam(HashMap edgeTo) {
-         int size;
-         if (mode == "h") {
-            size = width();
-         }
-         else if (mode == "v") {
-            size = height();
-         }
-         else
-            throw new IllegalArgumentException();
-         int[] path = new int[size];
-         String cur = (String)end;
-
-         while (size - 1 >= 0) {
-            if (mode == "h") {
-               path[size - 1] = (new Node(cur)).row();
-            }
-            else if (mode == "v") {
-               path[size - 1] = (new Node(cur)).col();
-            }
-            else
-               throw new IllegalArgumentException();
-            if (!edgeTo.containsKey((String)cur)) {
-               break;
-            }
-            cur = (String)edgeTo.get(cur);
-            size --;
-         }
-         return path;
-      }
-
-      public int[] seam() {
-         return seam;
-      }
-
-      public double eng() {
-         return eng;
-      }
-
-      @Override
-      public int compareTo(Seam n) {
-         if(this.eng > n.eng) {
-            return 1;
-         }
-         else if(this.eng < n.eng) {
-            return -1;
-         }
-         return 0;
-      }
-
-   }
-
-   private ArrayList<Node> getNeighbors(String mode, int col, int row) {
-      ArrayList<Node> neighbers = new ArrayList<Node>();
-      if (mode == "h") {
-         if (col == width() - 1)
-            return null;
-         neighbers.add(new Node(col + 1, row));
-         if (row != 0) {
-            neighbers.add(new Node(col + 1, row - 1));
-         }
-         if (row != height() - 1) {
-            neighbers.add(new Node(col + 1, row + 1));
-         }
-         return neighbers;
-      }
-      else if (mode == "v") {
-         if (row == height() - 1)
-            return null;
-         neighbers.add(new Node(col, row + 1));
-         if (col != 0) {
-            neighbers.add(new Node(col - 1, row + 1));
-         }
-         if (col != width() - 1) {
-            neighbers.add(new Node(col + 1, row + 1));
-         }
-         return neighbers;
+      else if (mode.equals("v")) {
+         size = height();
       }
       else
          throw new IllegalArgumentException();
+      int[] path = new int[size];
+      String cur = end;
+
+      while (size - 1 >= 0) {
+         path[size - 1] = str2id(mode, cur);
+         cur = (String)edgeTo.get(cur);
+         size--;
+      }
+      return path;
+   }
+
+
+   private String id2str(int col, int row) {
+      return col + " " + row;
+   }
+
+   private int str2id(String mode, String str) {
+      if (mode.equals("v"))
+         return Integer.parseInt(str.split(" ")[0]);
+      else
+         return Integer.parseInt(str.split(" ")[1]);
    }
 
    // sequence of indices for horizontal seam
@@ -249,34 +154,31 @@ public class SeamCarver {
       double cost = Double.MAX_VALUE;
       String cur, next, end = null;
 
-      for (int col = 0; col < width(); col ++)
-         for (int row = 0; row < height(); row ++)
+      for (int col = 0; col < width() - 1; col++) {
+         for (int row = 0; row < height(); row++)
          {
-            Node curNode = new Node(col, row);
-            cur = curNode.toString();
+            cur = id2str(col, row);
             if (col == 0) {
-               discTo.put(cur, energy(col, row));
                edgeTo.put(cur, null);
+               discTo.put(cur, energy(col, row));
             }
-            if (getNeighbors(mode, col, row) == null) {
-               double curCost = discTo.get(cur);
-               if (curCost < cost)
-               {
-                  cost = curCost;
-                  end = cur;
+            for (int k = row - 1; k <= row + 1; k++)
+               if (k >= 0 && k < height()) {
+                  next = id2str(col + 1, k);
+                  double newEng = energy(col + 1, k) + discTo.get(cur);
+                  if (discTo.get(next) == null || newEng < discTo.get(next))
+                  {
+                     edgeTo.put(next, cur);
+                     discTo.put(next, newEng);
+                     if (col + 1 == width() - 1 && newEng < cost) {
+                        cost = newEng;
+                        end = next;
+                     }
+                  }
                }
-               continue;
-            }
-            for (Node nextNode: getNeighbors(mode, col, row)){
-               next = nextNode.toString();
-               double newEng = energy(col, row) + discTo.get(cur);
-               if (discTo.get(next) == null || newEng < discTo.get(next)) {
-                  edgeTo.put(next, cur);
-                  discTo.put(next, newEng);
-               }
-            }
          }
-      return new Seam(mode, edgeTo, end, cost).seam();
+      }
+      return getSeam(mode, edgeTo, end);
    }
 
    // sequence of indices for vertical seam
@@ -287,40 +189,35 @@ public class SeamCarver {
       double cost = Double.MAX_VALUE;
       String cur, next, end = null;
 
-      for (int row = 0; row < height(); row ++)
-         for (int col = 0; col < width(); col ++)
+      for (int row = 0; row < height() - 1; row++)
+         for (int col = 0; col < width(); col++)
          {
-            Node curNode = new Node(col, row);
-            cur = curNode.toString();
+            cur = id2str(col, row);
             if (row == 0) {
-               discTo.put(cur, energy(col, row));
                edgeTo.put(cur, null);
+               discTo.put(cur, energy(col, row));
             }
-            if (getNeighbors(mode, col, curNode.row) == null) {
-               double curCost = discTo.get(cur);
-               if (curCost < cost)
-               {
-                  cost = curCost;
-                  end = cur;
+            for (int k = col - 1; k <= col + 1; k++)
+               if (k >= 0 && k < width()) {
+                  next = id2str(k, row + 1);
+                  double newEng = energy(k, row + 1) + discTo.get(cur);
+                  if (discTo.get(next) == null || newEng < discTo.get(next))
+                  {
+                     edgeTo.put(next, cur);
+                     discTo.put(next, newEng);
+                     if (row + 1 == height() - 1 && newEng < cost) {
+                        cost = newEng;
+                        end = next;
+                     }
+                  }
                }
-               continue;
-            }
-            for (Node nextNode: getNeighbors(mode, col, row)){
-               next = nextNode.toString();
-               double newEng = energy(col, nextNode.row()) + discTo.get(cur);
-               if (discTo.get(next) == null || newEng < discTo.get(next)) {
-                  edgeTo.put(next, cur);
-                  discTo.put(next, newEng);
-               }
-            }
          }
-      return new Seam(mode, edgeTo, end, cost).seam();
+      return getSeam(mode, edgeTo, end);
    }
 
    private boolean isValidSeam(int[] seam) {
-      for (int i = 0; i < seam.length - 1; i ++) {
+      for (int i = 0; i < seam.length - 1; i++) {
          if (Math.abs(seam[i] - seam[i + 1]) > 1) {
-            StdOut.println(i);
             return false;
          }
       }
@@ -331,25 +228,21 @@ public class SeamCarver {
    public void removeHorizontalSeam(int[] seam) {
       if (width() <= 1 || height() <= 1 || seam.length < 0 || seam.length >width() || !isValidSeam(seam))
          throw new IllegalArgumentException();
-      Picture newPic = new Picture(width(), height() - 1);
       double[][] newGrid = new double[height() - 1][width()];
-      for (int col = 0; col < width(); col ++) {
-         boolean isDel = false;
-         for (int row = 0; row < height() - 1; row ++) {
-            if (row == seam[col]) {
-               isDel = true;
-            }
-            if (!isDel) {
-               newPic.set(col, row, pic.get(col, row));
+      Picture newPic = new Picture(width(), height() - 1);
+      for (int col = 0; col < width(); col++) {
+         for (int row = 0; row < height() - 1; row++) {
+            if (row < seam[col]) {
                newGrid[row][col] = engGrid[row][col];
+               newPic.set(col, row, pic.get(col, row));
             }
             else {
-               newPic.set(col, row, pic.get(col, row + 1));
                newGrid[row][col] = engGrid[row + 1][col];
+               newPic.set(col, row, pic.get(col, row + 1));
             }
          }
       }
-      height --;
+      height--;
       engGrid = newGrid.clone();
       pic = new Picture(newPic);
    }
@@ -358,33 +251,29 @@ public class SeamCarver {
    public void removeVerticalSeam(int[] seam) {
       if (width() <= 1 || height() <= 1 || seam.length < 0 || seam.length > height() || !isValidSeam(seam))
          throw new IllegalArgumentException();
-      Picture newPic = new Picture(width() - 1, height());
       double[][] newGrid = new double[height()][width() - 1];
-      for (int row = 0; row < height(); row ++) {
-         boolean isDel = false;
-         for (int col = 0; col < width() - 1; col ++) {
-            if (col == seam[row]) {
-               isDel = true;
-            }
-            if (!isDel) {
-               newPic.set(col, row, pic.get(col, row));
+      Picture newPic = new Picture(width() - 1, height());
+      for (int row = 0; row < height(); row++) {
+         for (int col = 0; col < width() - 1; col++)
+            if (col < seam[row]) {
                newGrid[row][col] = engGrid[row][col];
+               newPic.set(col, row, pic.get(col, row));
             }
             else {
-               newPic.set(col, row, pic.get(col + 1, row));
                newGrid[row][col] = engGrid[row][col + 1];
+               newPic.set(col, row, pic.get(col + 1, row));
             }
-         }
       }
-      width --;
+      width--;
       engGrid = newGrid.clone();
-      pic = pic.clone();
+      pic = new Picture(newPic);
    }
 
    public static void main(String args[]) {
       Picture inputImg = new Picture(args[0]);
       SeamCarver sc = new SeamCarver(inputImg);
-      for (int i = 0; i < 150; i ++) {
+      inputImg.show();
+      for (int i = 0; i < 250; i++) {
          int[] seam = sc.findVerticalSeam();
          StdOut.println(seam.length + " " + sc.width() + " " + sc.height());
          sc.removeVerticalSeam(seam);
