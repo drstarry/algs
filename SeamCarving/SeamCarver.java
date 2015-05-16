@@ -62,18 +62,12 @@ public class SeamCarver {
    private Picture pic;
    private int width;
    private int height;
-   private double[][] engGrid;
 
    // create a seam carver object based on the giverivaten picture
    public SeamCarver(Picture picture) {
       pic = new Picture(picture);
       width = pic.width();
       height = pic.height();
-      engGrid = new double[height][width];
-      for (int col = 0; col < width; col++)
-         for (int row = 0; row < height; row++) {
-            engGrid[row][col] = computeEng(col, row);
-         }
    }
 
    private double computeEng(int col, int row) {
@@ -110,7 +104,7 @@ public class SeamCarver {
       // StdOut.println(x + " " + y);
       if (x < 0 || x >= width() || y < 0 || y >= height())
          throw new IndexOutOfBoundsException();
-      return engGrid[y][x];
+      return computeEng(x, y);
    }
 
    private int[] getSeam(String mode, HashMap edgeTo, String end) {
@@ -133,7 +127,6 @@ public class SeamCarver {
       }
       return path;
    }
-
 
    private String id2str(int col, int row) {
       return col + " " + row;
@@ -195,12 +188,12 @@ public class SeamCarver {
             cur = id2str(col, row);
             if (row == 0) {
                edgeTo.put(cur, null);
-               discTo.put(cur, energy(col, row));
+               discTo.put(cur, computeEng(col, row));
             }
             for (int k = col - 1; k <= col + 1; k++)
                if (k >= 0 && k < width()) {
                   next = id2str(k, row + 1);
-                  double newEng = energy(k, row + 1) + discTo.get(cur);
+                  double newEng = computeEng(k, row + 1) + discTo.get(cur);
                   if (discTo.get(next) == null || newEng < discTo.get(next))
                   {
                      edgeTo.put(next, cur);
@@ -228,22 +221,18 @@ public class SeamCarver {
    public void removeHorizontalSeam(int[] seam) {
       if (width() <= 1 || height() <= 1 || seam.length < 0 || seam.length >width() || !isValidSeam(seam))
          throw new IllegalArgumentException();
-      double[][] newGrid = new double[height() - 1][width()];
       Picture newPic = new Picture(width(), height() - 1);
       for (int col = 0; col < width(); col++) {
          for (int row = 0; row < height() - 1; row++) {
             if (row < seam[col]) {
-               newGrid[row][col] = engGrid[row][col];
                newPic.set(col, row, pic.get(col, row));
             }
             else {
-               newGrid[row][col] = engGrid[row + 1][col];
                newPic.set(col, row, pic.get(col, row + 1));
             }
          }
       }
       height--;
-      engGrid = newGrid.clone();
       pic = new Picture(newPic);
    }
 
@@ -251,21 +240,17 @@ public class SeamCarver {
    public void removeVerticalSeam(int[] seam) {
       if (width() <= 1 || height() <= 1 || seam.length < 0 || seam.length > height() || !isValidSeam(seam))
          throw new IllegalArgumentException();
-      double[][] newGrid = new double[height()][width() - 1];
       Picture newPic = new Picture(width() - 1, height());
       for (int row = 0; row < height(); row++) {
          for (int col = 0; col < width() - 1; col++)
             if (col < seam[row]) {
-               newGrid[row][col] = engGrid[row][col];
                newPic.set(col, row, pic.get(col, row));
             }
             else {
-               newGrid[row][col] = engGrid[row][col + 1];
                newPic.set(col, row, pic.get(col + 1, row));
             }
       }
       width--;
-      engGrid = newGrid.clone();
       pic = new Picture(newPic);
    }
 
@@ -273,10 +258,12 @@ public class SeamCarver {
       Picture inputImg = new Picture(args[0]);
       SeamCarver sc = new SeamCarver(inputImg);
       inputImg.show();
-      for (int i = 0; i < 250; i++) {
+      for (int i = 0; i < 100; i++) {
          int[] seam = sc.findVerticalSeam();
-         StdOut.println(seam.length + " " + sc.width() + " " + sc.height());
+         // StdOut.println(seam.length + " " + sc.width() + " " + sc.height());
          sc.removeVerticalSeam(seam);
+         seam = sc.findHorizontalSeam();
+         sc.removeHorizontalSeam(seam);
       }
       sc.picture().show();
    }
