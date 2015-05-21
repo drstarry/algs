@@ -14,29 +14,91 @@
 // 8+              11
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Set;
 
 public class BoggleSolver
 {
-    private TST<Integer> dictTrie;
+    private BoggleDictionary boggleTrie;
+
+    private class DictionaryNode {
+        private char c; // character
+        private DictionaryNode left, mid, right; // left, middle, and right subtries
+        private String val; // value associated with string
+    }
+
+    private class BoggleDictionary {
+        private DictionaryNode root;
+
+        public void put(String s) {
+            root = put(root, s, s, 0);
+        }
+
+        private DictionaryNode put(DictionaryNode x, String s, String val, int d) {
+            char c = s.charAt(d);
+            if (x == null) {
+                x = new DictionaryNode();
+                x.c = c;
+            }
+            if (c < x.c)
+                x.left = put(x.left, s, val, d);
+            else if (c > x.c)
+                x.right = put(x.right, s, val, d);
+            else if (d < s.length() - 1)
+                x.mid = put(x.mid, s, val, d + 1);
+            else
+                x.val = val;
+            return x;
+        }
+
+        private boolean contains(String key) {
+            return get(key) != null;
+        }
+
+        private String get(String key) {
+            if (key == null)
+                throw new NullPointerException();
+            if (key.length() == 0)
+                throw new IllegalArgumentException("key must have length >= 1");
+            DictionaryNode x = get(root, key, 0);
+            if (x == null)
+                return null;
+            return x.val;
+        }
+
+        // return subtrie corresponding to given key
+        private DictionaryNode get(DictionaryNode x, String key, int d) {
+            if (x == null)
+                return null;
+            char c = key.charAt(d);
+            if (c < x.c)
+                return get(x.left, key, d);
+            else if (c > x.c)
+                return get(x.right, key, d);
+            else if (d < key.length() - 1)
+                return get(x.mid, key, d + 1);
+            else
+                return x;
+        }
+    }
 
     // Initializes the data structure using the given array of strings as the dictionary.
     // (You can assume each word in the dictionary contains only the uppercase letters A through Z.)
     public BoggleSolver(String[] dictionary) {
-        dictTrie = new TST<Integer>();
+        boggleTrie = new BoggleDictionary();
         for (int val = 0; val < dictionary.length; val++)
-            dictTrie.put(dictionary[val], val);
+            boggleTrie.put(dictionary[val]);
     }
 
     private class BoggleWord {
-        private Hashtable<String, Set<String>> words;
+        private HashSet<String> words;
         private Hashtable<String, Character> bd;
         private int rows, cols;
 
         public BoggleWord(BoggleBoard board) {
-            words = new Hashtable<String, Set<String>>();
+            words = new HashSet<String>();
             bd = new Hashtable<String, Character>();
             rows = board.rows();
             cols = board.cols();
@@ -50,10 +112,6 @@ public class BoggleSolver
                 return "QU";
             else
                 return Character.toString(s);
-        }
-
-        public Set<String> getWords(int x, int y) {
-            return words.get(getHash(x, y));
         }
 
         private String getHash(int x, int y) {
@@ -78,23 +136,26 @@ public class BoggleSolver
         public void buildWord(int x, int y) {
             ArrayList<String> visited = new ArrayList<String>();
             String start = getHash(x, y);
-            words.put(start, new HashSet<String>());
-            dfs(start, start, visited);
+            String suffix = getValue(bd.get(start));
+            DictionaryNode curNode = boggleTrie.get(boggleTrie.root, getValue(bd.get(start)), 0);
+            if (curNode != null)
+                dfs(curNode, start, start, visited);
         }
 
-        private void dfs(String start, String cur, ArrayList<String> visited) {
+        private void dfs(DictionaryNode curNode, String start, String cur, ArrayList<String> visited) {
             visited.add(cur);
-            String str = word(visited);
-            if (!dictTrie.isPrefix(str)) {
-                return;
+            String str = curNode.val;
+            if (str != null && str.length() > 2 && !words.contains(str)) {
+                words.add(str);
             }
 
-            if (str.length() > 2 && dictTrie.get(str) != null && !words.get(start).contains(str)) {
-                words.get(start).add(str);
-            }
             for (String next: getSurrounds(cur)) {
-                if (!visited.contains(next))
-                    dfs(start, next, new ArrayList<String>(visited));
+                if (!visited.contains(next)) {
+                    String prefix = getValue(bd.get(next));
+                    DictionaryNode nextNode = boggleTrie.get(curNode.mid, prefix, 0);
+                    if (nextNode != null)
+                        dfs(nextNode, start, next, new ArrayList<String>(visited));
+                }
             }
         }
 
@@ -114,20 +175,20 @@ public class BoggleSolver
 
     // Returns the set of all valid words in the given Boggle board, as an Iterable.
     public Iterable<String> getAllValidWords(BoggleBoard board) {
-        Set<String> words = new HashSet<String>();
         BoggleWord bw = new BoggleWord(board);
         for (int i = 0; i < board.rows(); i++)
             for (int j = 0; j < board.cols(); j++) {
                 bw.buildWord(i, j);
-                words.addAll(bw.getWords(i, j));
             }
+        ArrayList<String> words = new ArrayList<String>(bw.words);
+        Collections.sort(words);
         return words;
     }
 
     // Returns the score of the given word if it is in the dictionary, zero otherwise.
     // (You can assume the word contains only the uppercase letters A through Z.)
     public int scoreOf(String word) {
-        if (dictTrie.get(word) != null) {
+        if (boggleTrie.get(word) != null) {
             int len  = word.length();
             switch(len) {
                 case 1: case 2: return 0;
