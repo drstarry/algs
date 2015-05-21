@@ -17,6 +17,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.ArrayList;
 
 public class BoggleSolver
@@ -29,7 +30,6 @@ public class BoggleSolver
         dictTrie = new TST<Integer>();
         for (int val = 0; val < dictionary.length; val++)
             dictTrie.put(dictionary[val], val);
-        StdOut.print(dictTrie.get("EQUATION"));
     }
 
     private class BoggleWord {
@@ -80,14 +80,13 @@ public class BoggleSolver
         public void buildWord(int x, int y) {
             ArrayList<String> visited = new ArrayList<String>();
             String start = getHash(x, y);
-            StdOut.print(start+ " " + bd.get(start) + " ------ \n");
             words.put(start, new HashSet<String>());
             dfs(start, start, visited);
         }
 
         private void dfs(String start, String cur, ArrayList<String> visited) {
             visited.add(cur);
-
+            String str = word(visited);
             if (!dictTrie.isPrefix(str)) {
                 return;
             }
@@ -108,7 +107,6 @@ public class BoggleSolver
             for (int i = _i - 1; i <= _i + 1; i++)
                 for (int j = _j - 1; j <= _j + 1; j++)
                     if (i >= 0 && i < rows && j >= 0 && j < cols && !(i == _i && j == _j)) {
-                        StdOut.print(getHash(i, j)+"\n");
                         surrounds.add(getHash(i, j));
                     }
             return surrounds;
@@ -124,7 +122,6 @@ public class BoggleSolver
             for (int j = 0; j < board.cols(); j++) {
                 bw.buildWord(i, j);
                 words.addAll(bw.getWords(i, j));
-                StdOut.print(bw.getWords(i, j));
             }
         return words;
     }
