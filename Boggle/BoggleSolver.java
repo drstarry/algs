@@ -13,12 +13,10 @@
 // 7               5
 // 8+              11
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.Set;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.ArrayList;
+import java.util.Set;
 
 public class BoggleSolver
 {
@@ -55,7 +53,7 @@ public class BoggleSolver
         }
 
         public Set<String> getWords(int x, int y) {
-            return words.get(getHash(x,y));
+            return words.get(getHash(x, y));
         }
 
         private String getHash(int x, int y) {
@@ -91,7 +89,7 @@ public class BoggleSolver
                 return;
             }
 
-            if (str.length() > 2 && dictTrie.get(str)!=null && !words.get(start).contains(str)) {
+            if (str.length() > 2 && dictTrie.get(str) != null && !words.get(start).contains(str)) {
                 words.get(start).add(str);
             }
             for (String next: getSurrounds(cur)) {
@@ -101,12 +99,12 @@ public class BoggleSolver
         }
 
         private Set<String> getSurrounds(String hashCode) {
-            int _i = getX(hashCode);
-            int _j = getY(hashCode);
+            int row = getX(hashCode);
+            int col = getY(hashCode);
             Set<String> surrounds = new HashSet<String>();
-            for (int i = _i - 1; i <= _i + 1; i++)
-                for (int j = _j - 1; j <= _j + 1; j++)
-                    if (i >= 0 && i < rows && j >= 0 && j < cols && !(i == _i && j == _j)) {
+            for (int i = row - 1; i <= row + 1; i++)
+                for (int j = col - 1; j <= col + 1; j++)
+                    if (i >= 0 && i < rows && j >= 0 && j < cols && !(i == row && j == col)) {
                         surrounds.add(getHash(i, j));
                     }
             return surrounds;
